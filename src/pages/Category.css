@@ -1,0 +1,89 @@
+/* Category Page Styles */
+.category-page {
+    min-height: 100vh;
+    background-color: #FAFAFA;
+    padding-bottom: 5rem;
+}
+
+.category-container {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.category-header {
+    margin-bottom: 1.5rem;
+}
+
+.category-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2D2D2D;
+    text-transform: capitalize;
+    margin-bottom: 0.5rem;
+}
+
+.category-description {
+    color: #6B6B6B;
+    font-size: 0.875rem;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.loading-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.loading-skeleton {
+    background-color: #F9F7F4;
+    border-radius: 24px;
+    height: 20rem;
+    animation: shimmer 1.5s ease-in-out infinite;
+    background: linear-gradient(to right, #f7f7f7 8%, #e8e8e8 18%, #f7f7f7 33%);
+    background-size: 800px 104px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 0;
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.empty-icon {
+    font-size: 3.75rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+}
+
+.empty-text {
+    color: #6B6B6B;
+    font-size: 1rem;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -468px 0;
+    }
+
+    100% {
+        background-position: 468px 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+    <svg width="192" height="192" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="96" cy="96" r="96" fill="#8BC34A"/>
+        <text x="96" y="96" font-family="Arial, sans-serif" font-size="120" font-weight="bold" 
+              fill="white" text-anchor="middle" dominant-baseline="central">M</text>
+    </svg>
+</body>
+</html>

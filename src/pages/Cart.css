@@ -1,0 +1,233 @@
+/* Cart Page Styles */
+.cart-page {
+    min-height: 100vh;
+    background-color: #FAFAFA;
+    padding-bottom: 5rem;
+}
+
+.cart-container {
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.cart-header {
+    margin-bottom: 1.5rem;
+}
+
+.cart-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #2D2D2D;
+}
+
+.cart-items {
+    margin-bottom: 1.5rem;
+}
+
+.cart-item {
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.3s;
+}
+
+.cart-item:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.cart-item-content {
+    display: flex;
+    gap: 1rem;
+}
+
+.cart-item-image {
+    width: 5rem;
+    height: 5rem;
+    object-fit: cover;
+    border-radius: 12px;
+    background-color: #F7F7F7;
+}
+
+.cart-item-details {
+    flex: 1;
+}
+
+.cart-item-name {
+    font-weight: 600;
+    color: #2D2D2D;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.cart-item-price {
+    color: #6B6B6B;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+}
+
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.remove-button {
+    background-color: transparent;
+    border: none;
+    color: #f97316;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: color 0.3s;
+    padding: 0.25rem 0.5rem;
+}
+
+.remove-button:hover {
+    color: #ea580c;
+    text-decoration: underline;
+}
+
+.item-total {
+    font-weight: 600;
+    color: #2D2D2D;
+}
+
+.cart-summary {
+    background-color: #FFFFFF;
+    border-radius: 24px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    margin-bottom: 1rem;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.summary-label {
+    font-size: 1rem;
+    color: #6B6B6B;
+}
+
+.summary-value {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #2D2D2D;
+}
+
+.summary-total {
+    padding-top: 1rem;
+    border-top: 2px solid #F0F0F0;
+}
+
+.total-label {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2D2D2D;
+}
+
+.total-value {
+    font-size: 1.875rem;
+    font-weight: 800;
+    color: #8BC34A;
+}
+
+.cart-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.checkout-button {
+    width: 100%;
+    background-color: #16a34a;
+    color: #FFFFFF;
+    font-weight: 600;
+    padding: 1rem;
+    border-radius: 20px;
+    border: none;
+    font-size: 1.125rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 56px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 12px rgba(22, 163, 74, 0.3);
+    text-decoration: none;
+}
+
+.checkout-button:hover {
+    background-color: #15803d;
+    box-shadow: 0 4px 20px rgba(22, 163, 74, 0.4);
+}
+
+.checkout-button:active {
+    transform: scale(0.98);
+}
+
+.continue-shopping {
+    width: 100%;
+    background-color: #F9F7F4;
+    color: #2D2D2D;
+    font-weight: 600;
+    padding: 1rem;
+    border-radius: 20px;
+    border: 2px solid #F0F0F0;
+    font-size: 1rem;
+    transition: all 0.3s;
+    min-height: 56px;
+    cursor: pointer;
+}
+
+.continue-shopping:hover {
+    background-color: #F5F2ED;
+    border-color: #8BC34A;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+.empty-cart-icon {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+}
+
+.empty-cart-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2D2D2D;
+    margin-bottom: 0.5rem;
+}
+
+.empty-cart-text {
+    color: #6B6B6B;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+}
+
+.shop-now-button {
+    background-color: #8BC34A;
+    color: #FFFFFF;
+    font-weight: 600;
+    padding: 1rem 2rem;
+    border-radius: 20px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.shop-now-button:hover {
+    background-color: #689F38;
+}
