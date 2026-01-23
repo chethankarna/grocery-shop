@@ -53,7 +53,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #2D2D2D;
+    color: #000000;
     border: none;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -138,7 +138,7 @@
 }
 
 .product-meta-value {
-    color: #8BC34A;
+    color: #508d09d3;
     font-weight: 500;
 }
 

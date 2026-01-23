@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import { registerSW } from 'virtual:pwa-register'
+import { AuthProvider } from "./context/AuthContext";
 
 // Register service worker for PWA functionality
 // This provides auto-update and offline support
@@ -24,6 +25,8 @@ const updateSW = registerSW({
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <App />
-    </React.StrictMode>,
+        <AuthProvider>
+            <App />
+        </AuthProvider>
+    </React.StrictMode>
 )

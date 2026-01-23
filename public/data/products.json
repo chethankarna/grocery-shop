@@ -15,13 +15,31 @@
         "id": "prod002",
         "category": "Fruits",
         "name": "Ripe Bananas",
-        "price": 59,
+        "price": 80,
+        "originalPrice": 80,
+        "discountedPrice": 59,
         "unit": "kg",
         "image": "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=800&q=80",
         "description": "Sweet yellow bananas, perfect for smoothies and snacking. Naturally rich in potassium.",
         "stock": 40,
         "visible": true,
-        "createdAt": "2025-01-01T09:00:00+05:30"
+        "createdAt": "2025-01-01T09:00:00+05:30",
+        "salesCount": 150,
+        "isBestSeller": true,
+        "offers": [
+            {
+                "type": "BEST_SELLER",
+                "isActive": true,
+                "priority": 1
+            },
+            {
+                "type": "TODAYS_DEAL",
+                "isActive": true,
+                "startTime": "2026-01-20T00:00:00+05:30",
+                "endTime": "2026-01-20T23:59:59+05:30",
+                "priority": 2
+            }
+        ]
     },
     {
         "id": "prod003",
@@ -31,21 +49,39 @@
         "unit": "ltr",
         "image": "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=800&q=80",
         "description": "Full cream organic milk, farm fresh and delivered daily. No added preservatives.",
-        "stock": 15,
+        "stock": 8,
         "visible": true,
-        "createdAt": "2025-01-01T09:00:00+05:30"
+        "createdAt": "2025-01-01T09:00:00+05:30",
+        "offers": [
+            {
+                "type": "LIMITED_STOCK",
+                "isActive": true,
+                "priority": 4
+            }
+        ]
     },
     {
         "id": "prod004",
         "category": "Vegetables",
         "name": "Fresh Tomatoes",
-        "price": 45,
+        "price": 60,
+        "originalPrice": 60,
+        "discountedPrice": 45,
         "unit": "kg",
         "image": "https://images.unsplash.com/photo-1546470427-e26264be0b0d?w=800&q=80",
         "description": "Juicy red tomatoes, locally sourced. Great for salads and cooking.",
         "stock": 30,
         "visible": true,
-        "createdAt": "2025-01-02T09:00:00+05:30"
+        "createdAt": "2025-01-02T09:00:00+05:30",
+        "offers": [
+            {
+                "type": "TODAYS_DEAL",
+                "isActive": true,
+                "startTime": "2026-01-20T00:00:00+05:30",
+                "endTime": "2026-01-20T23:59:59+05:30",
+                "priority": 2
+            }
+        ]
     },
     {
         "id": "prod005",
@@ -57,7 +93,16 @@
         "description": "Crisp and sweet red apples. Imported variety, high quality.",
         "stock": 50,
         "visible": true,
-        "createdAt": "2025-01-02T09:00:00+05:30"
+        "createdAt": "2025-01-02T09:00:00+05:30",
+        "salesCount": 120,
+        "isBestSeller": true,
+        "offers": [
+            {
+                "type": "BEST_SELLER",
+                "isActive": true,
+                "priority": 1
+            }
+        ]
     },
     {
         "id": "prod006",
@@ -75,13 +120,22 @@
         "id": "prod007",
         "category": "Dairy",
         "name": "Fresh Paneer",
-        "price": 299,
+        "price": 350,
+        "originalPrice": 350,
+        "discountedPrice": 299,
         "unit": "kg",
         "image": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&q=80",
         "description": "Soft and fresh paneer, made daily from pure milk. No additives.",
         "stock": 12,
         "visible": true,
-        "createdAt": "2025-01-03T09:00:00+05:30"
+        "createdAt": "2025-01-03T09:00:00+05:30",
+        "offers": [
+            {
+                "type": "LIMITED_STOCK",
+                "isActive": true,
+                "priority": 4
+            }
+        ]
     },
     {
         "id": "prod008",
@@ -123,13 +177,29 @@
         "id": "prod011",
         "category": "Fruits",
         "name": "Fresh Mangoes",
-        "price": 149,
+        "price": 180,
+        "originalPrice": 180,
+        "discountedPrice": 149,
         "unit": "kg",
         "image": "https://images.unsplash.com/photo-1553279768-865429fa0078?w=800&q=80",
         "description": "Sweet and juicy mangoes, seasonal variety. King of fruits!",
         "stock": 8,
         "visible": true,
-        "createdAt": "2025-01-05T09:00:00+05:30"
+        "createdAt": "2025-01-05T09:00:00+05:30",
+        "offers": [
+            {
+                "type": "LIMITED_STOCK",
+                "isActive": true,
+                "priority": 4
+            },
+            {
+                "type": "FLASH_SALE",
+                "isActive": true,
+                "startTime": "2026-01-20T06:00:00+05:30",
+                "endTime": "2026-01-20T12:00:00+05:30",
+                "priority": 1
+            }
+        ]
     },
     {
         "id": "prod012",

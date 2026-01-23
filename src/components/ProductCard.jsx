@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { formatCurrency } from '../utils/currency'
 import InlineQuantitySelector from './InlineQuantitySelector'
+import PriceDisplay from './PriceDisplay'
+import OfferBadges from './OfferBadges'
+import WishlistButton from './WishlistButton'
 import './ProductCard.css'
 
 function ProductCard({ product, showAddButton = true }) {
@@ -29,6 +31,21 @@ function ProductCard({ product, showAddButton = true }) {
                         e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f7f7f7" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23999" font-family="sans-serif" font-size="14"%3ENo image%3C/text%3E%3C/svg%3E'
                     }}
                 />
+
+                {/* Wishlist Button */}
+                {!isOutOfStock && (
+                    <div className="product-wishlist-button">
+                        <WishlistButton productId={product.id} size="small" />
+                    </div>
+                )}
+
+                {/* Offer Badges (Overlay on image) */}
+                {!isOutOfStock && (
+                    <div className="product-badges-overlay">
+                        <OfferBadges product={product} maxBadges={2} />
+                    </div>
+                )}
+
                 {isOutOfStock && (
                     <div className="out-of-stock-overlay">
                         <span className="out-of-stock-badge">
@@ -44,21 +61,8 @@ function ProductCard({ product, showAddButton = true }) {
                     {product.name}
                 </h3>
 
-                <div className="product-price-container">
-                    <div>
-                        <span className="product-price">
-                            {formatCurrency(product.price)}
-                        </span>
-                        <span className="product-unit">
-                            /{product.unit}
-                        </span>
-                    </div>
-                    {product.stock > 0 && product.stock <= 10 && (
-                        <span className="product-stock-warning">
-                            {product.stock} left
-                        </span>
-                    )}
-                </div>
+                {/* Price Display */}
+                <PriceDisplay product={product} size="normal" />
 
                 {/* Inline Quantity Selector */}
                 {showAddButton && (

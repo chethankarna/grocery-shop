@@ -1,123 +1,249 @@
-/* Inline Quantity Selector for Product Card */
+/* InlineQuantitySelector - Modern Blinkit/Zepto Style with Gradient */
+
+/* ============================================
+   ADD BUTTON (Initial State)
+   ============================================ */
+.add-button-transform {
+    width: 100%;
+    height: 38px;
+    background: linear-gradient(135deg, #10B880 0%, #06996B 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(16, 184, 128, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.add-button-transform::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #12CA8D 0%, #078F5F 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.add-button-transform:hover::before {
+    opacity: 1;
+}
+
+.add-button-transform:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 184, 128, 0.35);
+}
+
+.add-button-transform:active {
+    transform: scale(0.96);
+    box-shadow: 0 1px 4px rgba(16, 184, 128, 0.2);
+}
+
+/* Text appears above gradient overlay */
+.add-button-transform span {
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================
+   OUT OF STOCK BUTTON
+   ============================================ */
+.out-of-stock-button {
+    width: 100%;
+    height: 38px;
+    background: #F3F4F6;
+    color: #9CA3AF;
+    font-weight: 600;
+    font-size: 13px;
+    border: 1px solid #E5E7EB;
+    border-radius: 999px;
+    cursor: not-allowed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ============================================
+   QUANTITY SELECTOR (Active State)
+   ============================================ */
 .inline-quantity-selector {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #8BC34A;
-    border-radius: 20px;
-    overflow: hidden;
-    min-height: 44px;
-    animation: expandIn 0.2s ease-out;
+    gap: 8px;
+    width: 100%;
+    height: 38px;
+    background: linear-gradient(135deg, #10B880 0%, #06996B 100%);
+    border-radius: 999px;
+    padding: 4px;
+    box-shadow: 0 2px 8px rgba(16, 184, 128, 0.25);
+    animation: morphIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes expandIn {
-    from {
-        transform: scaleX(0.8);
-        opacity: 0;
-    }
-
-    to {
-        transform: scaleX(1);
-        opacity: 1;
-    }
+.inline-quantity-selector.removing {
+    animation: morphOut 0.2s cubic-bezier(0.4, 0, 1, 1);
 }
 
+/* ============================================
+   QUANTITY BUTTONS (- and +)
+   ============================================ */
 .inline-qty-button {
-    min-width: 44px;
-    min-height: 44px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: white;
+    color: #10B880;
+    border: none;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: transparent;
-    border: none;
-    color: #FFFFFF;
-    font-weight: 700;
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.inline-qty-button:hover:not(:disabled) {
-    background-color: rgba(255, 255, 255, 0.15);
+.inline-qty-button:hover {
+    background: #F0FDF4;
+    transform: scale(1.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-.inline-qty-button:active:not(:disabled) {
+.inline-qty-button:active {
     transform: scale(0.9);
-    background-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .inline-qty-button:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
+    transform: none;
 }
 
+/* ============================================
+   QUANTITY DISPLAY
+   ============================================ */
 .inline-qty-display {
     flex: 1;
-    text-align: center;
-    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 15px;
     font-weight: 700;
-    font-size: 1rem;
+    min-width: 30px;
     user-select: none;
-    padding: 0 0.5rem;
-    min-width: 2.5rem;
 }
 
-/* Add button that transforms */
-.add-button-transform {
-    width: 100%;
-    background-color: transparent;
-    color: #8BC34A;
-    font-weight: 600;
-    padding: 0.625rem 1rem;
-    border-radius: 20px;
-    border: 2px solid #8BC34A;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    min-height: 44px;
-    cursor: pointer;
-}
-
-.add-button-transform:hover {
-    background-color: #8BC34A;
-    color: #FFFFFF;
-    box-shadow: 0 4px 6px -1px rgba(139, 195, 74, 0.3);
-}
-
-.add-button-transform:active {
-    transform: scale(0.95);
-}
-
-.add-button-transform:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(139, 195, 74, 0.3);
-}
-
-/* Smooth removing animation */
-.inline-quantity-selector.removing {
-    animation: shrinkOut 0.2s ease-out forwards;
-}
-
-@keyframes shrinkOut {
-    from {
-        transform: scaleX(1);
-        opacity: 1;
-    }
-
-    to {
-        transform: scaleX(0.8);
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes morphIn {
+    0% {
         opacity: 0;
+        transform: scale(0.95);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
     }
 }
 
-/* Out of stock button */
-.out-of-stock-button {
-    width: 100%;
-    background-color: #F0F0F0;
-    color: #D0D0D0;
-    font-weight: 500;
-    padding: 0.625rem 1rem;
-    border-radius: 20px;
-    border: none;
-    min-height: 44px;
-    cursor: not-allowed;
+@keyframes morphOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+/* ============================================
+   MOBILE OPTIMIZATIONS
+   ============================================ */
+@media (max-width: 420px) {
+
+    .add-button-transform,
+    .inline-quantity-selector {
+        height: 36px;
+    }
+
+    .add-button-transform {
+        font-size: 13px;
+    }
+
+    .inline-qty-button {
+        width: 28px;
+        height: 28px;
+        font-size: 18px;
+    }
+
+    .inline-qty-display {
+        font-size: 14px;
+        min-width: 28px;
+    }
+}
+
+@media (max-width: 360px) {
+
+    .add-button-transform,
+    .inline-quantity-selector {
+        height: 34px;
+    }
+
+    .inline-qty-button {
+        width: 26px;
+        height: 26px;
+        font-size: 16px;
+    }
+
+    .inline-qty-display {
+        font-size: 13px;
+        min-width: 26px;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+
+    .add-button-transform,
+    .inline-quantity-selector,
+    .inline-qty-button {
+        animation: none;
+        transition: none;
+    }
+
+    .add-button-transform:hover,
+    .inline-qty-button:hover {
+        transform: none;
+    }
+}
+
+/* Touch device - larger tap targets */
+@media (hover: none) and (pointer: coarse) {
+    .inline-qty-button {
+        width: 32px;
+        height: 32px;
+    }
+
+    .add-button-transform {
+        height: 40px;
+    }
 }

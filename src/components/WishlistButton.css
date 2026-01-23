@@ -1,0 +1,142 @@
+/* Wishlist Button - Animated Heart Toggle */
+
+/* ============================================
+   BUTTON CONTAINER
+   ============================================ */
+.wishlist-button {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.wishlist-button:hover {
+    transform: scale(1.1);
+}
+
+.wishlist-button:active {
+    transform: scale(0.9);
+}
+
+/* ============================================
+   HEART ICON
+   ============================================ */
+.wishlist-icon {
+    width: 18px;
+    height: 18px;
+    color: #6B7280;
+    /* Gray when inactive */
+    transition: all 0.2s ease;
+    will-change: transform, color;
+}
+
+/* Active state - Red and slightly smaller */
+.wishlist-button:has(svg[fill="currentColor"]) .wishlist-icon {
+    color: #EF4444;
+    /* Red when active */
+    transform: scale(0.3);
+    /* Slightly smaller (from 18px to ~16px) */
+}
+
+/* Alternative selector for active state */
+svg.wishlist-icon[fill="currentColor"] {
+    color: #EF4444;
+    transform: scale(0.88);
+}
+
+/* Hover effect on inactive heart */
+.wishlist-button:hover .wishlist-icon {
+    color: #EF4444;
+}
+
+/* Keep red color on hover when already active */
+.wishlist-button:hover svg.wishlist-icon[fill="currentColor"] {
+    color: #DC2626;
+    /* Darker red on hover */
+}
+
+/* ============================================
+   ANIMATION ON TOGGLE
+   ============================================ */
+.wishlist-button--animating {
+    animation: heartPulse 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes heartPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* ============================================
+   SIZE VARIANTS
+   ============================================ */
+.wishlist-button--small .wishlist-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.wishlist-button--small:has(svg[fill="currentColor"]) .wishlist-icon {
+    transform: scale(0.875);
+    /* From 16px to 14px */
+}
+
+.wishlist-button--large .wishlist-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.wishlist-button--large:has(svg[fill="currentColor"]) .wishlist-icon {
+    transform: scale(0.9);
+    /* From 20px to 18px */
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+.wishlist-button:focus-visible {
+    outline: 2px solid #EF4444;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .wishlist-icon,
+    .wishlist-button,
+    .wishlist-button--animating {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* ============================================
+   MOBILE TOUCH OPTIMIZATION
+   ============================================ */
+@media (hover: none) and (pointer: coarse) {
+    .wishlist-button {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .wishlist-button:hover {
+        transform: none;
+    }
+
+    .wishlist-button:active {
+        transform: scale(0.95);
+    }
+}

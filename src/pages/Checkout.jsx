@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getCart, clearCart } from '../services/cartService'
 import { submitOrder, createOrderObject, calculateTotals, DELIVERY_FEE } from '../services/orderService'
+import { placeOrder as placeFirestoreOrder } from '../services/ordersService'
+import { useAuth } from '../context/AuthContext'
 import { generateCheckoutMessage } from '../utils/whatsapp'
 import { formatCurrency } from '../utils/currency'
 import './Checkout.css'
@@ -12,6 +14,7 @@ const SHOP_CLOSE_HOUR = parseInt(import.meta.env.VITE_SHOP_CLOSE_HOUR || '21')
 
 function Checkout() {
     const navigate = useNavigate()
+    const { user, isCompleteUser } = useAuth()
     const [cart, setCart] = useState([])
     const [step, setStep] = useState('select') // 'select', 'pickup', 'delivery', 'success'
     const [orderType, setOrderType] = useState(null)
@@ -42,6 +45,19 @@ function Checkout() {
     const { subtotal, deliveryFee, total } = calculateTotals(cart, orderType)
 
     const handleSelectOption = (type) => {
+        // Check auth before proceeding
+        if (!isCompleteUser()) {
+            // Save order type and redirect to login
+            navigate('/login', {
+                state: {
+                    next: '/checkout',
+                    intent: 'PLACE_ORDER',
+                    orderType: type
+                }
+            })
+            return
+        }
+
         setOrderType(type)
         setStep(type === 'PICKUP' ? 'pickup' : 'delivery')
     }
@@ -130,12 +146,31 @@ function Checkout() {
                 customerDetails.deliveryAddress = deliveryAddress
             }
 
+            let orderId;
+
+            // Try to place order in Firestore if user is authenticated
+            if (isCompleteUser()) {
+                try {
+                    orderId = await placeFirestoreOrder(orderType, cart, user, customerDetails)
+                    console.log('Order placed in Firestore:', orderId)
+                } catch (firestoreError) {
+                    console.error('Firestore order failed:', firestoreError)
+                    setError(firestoreError.message)
+                    setLoading(false)
+                    return
+                }
+            }
+
+            // Also submit to Google Sheets for backup/notification
             const order = createOrderObject(cart, orderType, customerDetails)
+            if (orderId) {
+                order.firestore_id = orderId
+            }
 
             const result = await submitOrder(order)
 
-            if (result.success) {
-                setSubmittedOrder(order)
+            if (result.success || orderId) {
+                setSubmittedOrder({ ...order, order_id: orderId || order.order_id })
                 setStep('success')
                 clearCart()
             } else {

@@ -3,7 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { getProductById } from '../services/productsService'
 import { addToCart } from '../services/cartService'
 import { generateProductOrderUrl } from '../utils/whatsapp'
+import { getProductPricing } from '../services/offersService'
 import QuantitySelector from '../components/QuantitySelector'
+import PriceDisplay from '../components/PriceDisplay'
+import OfferBadges from '../components/OfferBadges'
+import WishlistButton from '../components/WishlistButton'
 import { formatCurrency } from '../utils/currency'
 import './Product.css'
 
@@ -90,6 +94,14 @@ function Product() {
                             e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23f0f0f0" width="400" height="400"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23999" font-family="sans-serif" font-size="20"%3ENo image%3C/text%3E%3C/svg%3E'
                         }}
                     />
+
+                    {/* Wishlist Button */}
+                    {!isOutOfStock && (
+                        <div className="absolute top-4 right-4 z-10">
+                            <WishlistButton productId={product.id} size="large" />
+                        </div>
+                    )}
+
                     {isOutOfStock && (
                         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                             <span className="text-white font-bold text-xl bg-red-500 px-6 py-2 rounded-full">
@@ -113,6 +125,11 @@ function Product() {
                 <div className="px-4">
                     {/* Product Info */}
                     <div className="mb-6">
+                        {/* Offer Badges */}
+                        <div className="mb-3">
+                            <OfferBadges product={product} maxBadges={3} />
+                        </div>
+
                         <div className="flex items-start justify-between mb-2">
                             <h1 className="text-2xl font-bold text-text-primary flex-1">
                                 {product.name}
@@ -124,13 +141,9 @@ function Product() {
                             )}
                         </div>
 
-                        <div className="flex items-baseline mb-4">
-                            <span className="text-3xl font-bold text-text-primary mr-2">
-                                {formatCurrency(product.price)}
-                            </span>
-                            <span className="text-lg text-text-secondary">
-                                /{product.unit}
-                            </span>
+                        {/* Price Display */}
+                        <div className="mb-4">
+                            <PriceDisplay product={product} size="large" />
                         </div>
 
                         {product.description && (
@@ -175,7 +188,7 @@ function Product() {
                                     className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                                     style={{ minHeight: '52px' }}
                                 >
-                                    {showAddFeedback ? '✓ Added to Cart!' : `Add to Cart - ${formatCurrency(product.price * quantity)} `}
+                                    {showAddFeedback ? '✓ Added to Cart!' : `Add to Cart - ${formatCurrency(getProductPricing(product).currentPrice * quantity)} `}
                                 </button>
 
                                 <button

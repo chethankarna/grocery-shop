@@ -1,22 +1,39 @@
-/* Product Card Styles */
+/* ProductCard - Modern Blinkit/Zepto Style */
+
+/* ============================================
+   CARD CONTAINER
+   ============================================ */
 .product-card {
-    background-color: #F9F7F4;
-    border-radius: 24px;
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    width: 100%;
+    max-width: 180px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    overflow: visible;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     animation: fadeIn 0.4s ease-out forwards;
+    position: relative;
 }
 
 .product-card:hover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
+.product-card:active {
+    transform: translateY(-2px) scale(0.98);
+}
+
+/* ============================================
+   IMAGE SECTION
+   ============================================ */
 .product-image-container {
     position: relative;
     aspect-ratio: 1 / 1;
-    background-color: #FFFFFF;
+    background: #F9FAFB;
+    border-radius: 12px;
+    margin: 12px 12px 8px 12px;
     overflow: hidden;
 }
 
@@ -24,85 +41,178 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .product-card:hover .product-image {
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
 
+/* ============================================
+   FLOATING WISHLIST ICON
+   ============================================ */
+.product-wishlist-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+    background: white;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.product-wishlist-button:hover {
+    transform: scale(1.1);
+    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); */
+}
+
+.product-wishlist-button:active {
+    transform: scale(0.95);
+}
+
+/* ============================================
+   BADGES
+   ============================================ */
+.product-badges-overlay {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* ============================================
+   OUT OF STOCK
+   ============================================ */
 .out-of-stock-overlay {
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(255, 255, 255, 0.9);
+    inset: 0;
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 12px;
+    z-index: 5;
 }
 
 .out-of-stock-badge {
-    color: #6B6B6B;
+    color: #6B7280;
     font-weight: 600;
-    font-size: 0.875rem;
-    background-color: #F0F0F0;
-    padding: 0.5rem 1rem;
-    border-radius: 9999px;
+    font-size: 13px;
+    background: #F3F4F6;
+    padding: 6px 16px;
+    border-radius: 999px;
+    letter-spacing: 0.2px;
 }
 
+/* ============================================
+   PRODUCT INFO SECTION
+   ============================================ */
 .product-info {
-    padding: 1rem;
+    padding: 0 12px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
+/* ============================================
+   PRODUCT TITLE
+   ============================================ */
 .product-name {
+    font-size: 15px;
     font-weight: 600;
-    color: #2D2D2D;
-    font-size: 0.875rem;
-    margin-bottom: 0.5rem;
+    color: #111827;
+    line-height: 1.35;
+    margin: 0;
     min-height: 40px;
-    overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
-    line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.product-price-container {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 0.75rem;
-}
-
-.product-price {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: #2D2D2D;
-}
-
-.product-unit {
-    font-size: 0.75rem;
-    color: #9B9B9B;
-    margin-left: 0.25rem;
-}
-
-.product-stock-warning {
-    font-size: 0.75rem;
-    color: #f97316;
-    font-weight: 500;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
+/* ============================================
+   MOBILE OPTIMIZATIONS
+   ============================================ */
+@media (max-width: 420px) {
+    .product-card {
+        max-width: 165px;
     }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    .product-name {
+        font-size: 14px;
+        min-height: 38px;
+    }
+
+    .product-image-container {
+        margin: 10px 10px 6px 10px;
+    }
+
+    .product-info {
+        padding: 0 10px 10px 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .product-card {
+        max-width: 150px;
+    }
+
+    .product-image-container {
+        margin: 8px 8px 6px 8px;
+        border-radius: 10px;
+    }
+
+    .product-info {
+        padding: 0 8px 8px 8px;
+        gap: 6px;
+    }
+
+    .product-name {
+        font-size: 13px;
+        min-height: 36px;
+    }
+
+    .product-wishlist-button {
+        width: 28px;
+        height: 28px;
+        top: 6px;
+        right: 6px;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+
+    .product-card,
+    .product-image,
+    .product-wishlist-button {
+        transition: none;
+    }
+
+    .product-card:hover .product-image {
+        transform: none;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .product-card:hover {
+        transform: none;
+    }
+
+    .product-card:active {
+        transform: scale(0.97);
     }
 }

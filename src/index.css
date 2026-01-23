@@ -1,3 +1,6 @@
+/* Import Global Theme - Must be first */
+@import './styles/theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

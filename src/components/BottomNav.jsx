@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { getCartItemCount } from '../services/cartService'
+import { useWishlist } from '../context/WishlistContext'
 import './BottomNav.css'
 
 function BottomNav() {
     const location = useLocation()
     const [cartCount, setCartCount] = useState(0)
+    const { wishlistCount } = useWishlist()
 
     // Update cart count on mount and when cart changes
     useEffect(() => {
@@ -34,12 +36,28 @@ function BottomNav() {
             )
         },
         {
-            path: '/category/all',
+            path: '/categories',
             label: 'Categories',
             icon: (active) => (
                 <svg className={`nav-icon ${active ? 'active' : 'inactive'}`} fill={active ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0  24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
+            )
+        },
+        {
+            path: '/wishlist',
+            label: 'Favorites',
+            icon: (active) => (
+                <div style={{ position: 'relative' }}>
+                    <svg className={`nav-icon ${active ? 'active' : 'inactive'}`} fill={active ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    {wishlistCount > 0 && (
+                        <span className="cart-badge">
+                            {wishlistCount > 9 ? '9+' : wishlistCount}
+                        </span>
+                    )}
+                </div>
             )
         },
         {
@@ -74,17 +92,14 @@ function BottomNav() {
             <div className="bottom-nav-container">
                 <div className="bottom-nav-items">
                     {navItems.map((item) => {
-                        const isActive = item.path === '/'
-                            ? location.pathname === '/'
-                            : location.pathname.startsWith(item.path)
+                        const isActive = location.pathname === item.path
 
                         return (
                             <Link
                                 key={item.path}
                                 to={item.path}
-                                className="nav-item"
-                                aria-label={item.label}
-                                aria-current={isActive ? 'page' : undefined}
+                                className={`nav-item ${isActive ? 'active' : ''}`}
+                                aria-label={`Navigate to ${item.label}`}
                             >
                                 {item.icon(isActive)}
                                 <span className={`nav-label ${isActive ? 'active' : 'inactive'}`}>
