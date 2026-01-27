@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { searchProducts } from '../services/productsService'
+import { useAuth } from '../context/AuthContext'
 import './Header.css'
 
 function Header() {
@@ -8,6 +9,7 @@ function Header() {
     const [isSearching, setIsSearching] = useState(false)
     const navigate = useNavigate()
     const location = useLocation()
+    const { user, isAdmin } = useAuth()
 
     // Debounced search handler
     useEffect(() => {
@@ -46,6 +48,27 @@ function Header() {
     return (
         <header className="header">
             <div className="header-container">
+                {/* Profile Icon (top-left, for all authenticated users) */}
+                {user && (
+                    <button
+                        onClick={() => navigate('/account')}
+                        className="header-profile-btn"
+                        aria-label="My Account"
+                    >
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                        >
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </button>
+                )}
+
                 {/* Search Bar */}
                 <form onSubmit={handleSearchSubmit} className="search-form">
                     <div>

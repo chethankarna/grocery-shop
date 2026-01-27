@@ -1,8 +1,24 @@
 import axios from 'axios'
+import { db } from '../firebase'
+import {
+    collection,
+    getDocs,
+    doc,
+    getDoc,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    onSnapshot,
+    query,
+    where,
+    orderBy,
+    serverTimestamp
+} from 'firebase/firestore'
 
-// Apps Script URL from environment variable
+// Apps Script URL from environment variable (legacy support)
 const APPS_SCRIPT_URL = import.meta.env.VITE_APPS_SCRIPT_URL || ''
 const FALLBACK_DATA_URL = '/data/products.json'
+const USE_FIRESTORE = import.meta.env.VITE_USE_FIRESTORE !== 'false' // Default to true
 
 // Cache for products
 let productsCache = null
@@ -10,11 +26,48 @@ let cacheTimestamp = null
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 
 /**
+ * Fetch all products from Firestore
+ * @returns {Promise<Array>} Array of products
+ */
+async function fetchProductsFromFirestore() {
+    try {
+        const productsRef = collection(db, 'products')
+        const snapshot = await getDocs(productsRef)
+        const products = []
+
+        snapshot.forEach(doc => {
+            products.push({
+                id: doc.id,
+                ...doc.data()
+            })
+        })
+
+        return products.filter(p => p.visible !== false)
+    } catch (error) {
+        console.error('Error fetching from Firestore:', error)
+        throw error
+    }
+}
+
+/**
  * Fetch all products from data source
  * @returns {Promise<Array>} Array of products
  */
 export async function fetchProducts() {
-    // Check cache first
+    // If using Firestore, skip cache and fetch directly
+    if (USE_FIRESTORE) {
+        try {
+            const products = await fetchProductsFromFirestore()
+            productsCache = products
+            cacheTimestamp = Date.now()
+            return products
+        } catch (error) {
+            console.error('Firestore fetch failed, trying fallback:', error)
+            // Fall through to legacy sources
+        }
+    }
+
+    // Check cache first for legacy sources
     if (productsCache && cacheTimestamp && (Date.now() - cacheTimestamp < CACHE_DURATION)) {
         return productsCache
     }
@@ -110,4 +163,197 @@ export async function searchProducts(query) {
 export function clearProductsCache() {
     productsCache = null
     cacheTimestamp = null
+}
+
+// ============= ADMIN FUNCTIONS (Firestore CRUD) =============
+
+/**
+ * Listen to products in real-time
+ * @param {Function} callback - Called with updated products array
+ * @param {Function} errorCallback - Called on error
+ * @returns {Function} Unsubscribe function
+ */
+export function listenProductsRealtime(callback, errorCallback) {
+    if (!USE_FIRESTORE) {
+        console.warn('Real-time listening requires Firestore')
+        return () => { }
+    }
+
+    try {
+        const productsRef = collection(db, 'products')
+        // Note: Using orderBy requires a Firestore index
+        // For now, we'll fetch without ordering to avoid delays
+        const q = query(productsRef)
+
+        const unsubscribe = onSnapshot(
+            q,
+            (snapshot) => {
+                const products = []
+                snapshot.forEach(doc => {
+                    products.push({
+                        id: doc.id,
+                        ...doc.data()
+                    })
+                })
+                callback(products)
+            },
+            (error) => {
+                console.error('Error listening to products:', error)
+                if (errorCallback) errorCallback(error)
+            }
+        )
+
+        return unsubscribe
+    } catch (error) {
+        console.error('Error setting up listener:', error)
+        if (errorCallback) errorCallback(error)
+        return () => { }
+    }
+}
+
+/**
+ * Upload product image to Cloudinary
+ * @param {File} file - Image file
+ * @param {string} productId - Optional product ID for naming
+ * @returns {Promise<string>} Cloudinary URL
+ */
+export async function uploadProductImage(file, productId = null) {
+    if (!file) throw new Error('No file provided')
+
+    try {
+        const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dqdbw0aab'
+        const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'grocery_products'
+
+        console.log('Uploading to Cloudinary...')
+
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('upload_preset', uploadPreset)
+
+        // Optional: Add folder and public_id for organization
+        if (productId) {
+            formData.append('public_id', `product_${productId}`)
+        }
+        formData.append('folder', 'products')
+
+        // Upload to Cloudinary
+        const response = await fetch(
+            `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+            {
+                method: 'POST',
+                body: formData
+            }
+        )
+
+        if (!response.ok) {
+            const error = await response.json()
+            throw new Error(error.error?.message || 'Upload failed')
+        }
+
+        const data = await response.json()
+        console.log('Upload successful:', data.secure_url)
+
+        // Return the secure URL
+        return data.secure_url
+    } catch (error) {
+        console.error('Error uploading image to Cloudinary:', error)
+        throw error
+    }
+}
+
+/**
+ * Add a new product to Firestore
+ * @param {Object} productData - Product data
+ * @returns {Promise<string>} New product ID
+ */
+export async function addProduct(productData) {
+    if (!USE_FIRESTORE) {
+        throw new Error('Firestore is required for adding products')
+    }
+
+    try {
+        console.log('Adding product to Firestore...', productData)
+        const productsRef = collection(db, 'products')
+
+        // Add timestamps and defaults
+        const newProduct = {
+            ...productData,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            visible: productData.visible !== undefined ? productData.visible : true,
+            stock: productData.stock || 0
+        }
+
+        console.log('Product data prepared, saving to Firestore...')
+        const docRef = await addDoc(productsRef, newProduct)
+        console.log('Product added successfully with ID:', docRef.id)
+
+        // Clear cache to force refresh
+        clearProductsCache()
+
+        return docRef.id
+    } catch (error) {
+        console.error('Error adding product:', error)
+        throw error
+    }
+}
+
+/**
+ * Update an existing product in Firestore
+ * @param {string} productId - Product ID
+ * @param {Object} productData - Updated product data
+ * @returns {Promise<void>}
+ */
+export async function updateProduct(productId, productData) {
+    if (!USE_FIRESTORE) {
+        throw new Error('Firestore is required for updating products')
+    }
+
+    try {
+        const productRef = doc(db, 'products', productId)
+
+        // Add updated timestamp
+        const updatedProduct = {
+            ...productData,
+            updatedAt: serverTimestamp()
+        }
+
+        await updateDoc(productRef, updatedProduct)
+
+        // Clear cache to force refresh
+        clearProductsCache()
+    } catch (error) {
+        console.error('Error updating product:', error)
+        throw error
+    }
+}
+
+/**
+ * Delete a product from Firestore
+ * @param {string} productId - Product ID
+ * @param {string} imageUrl - Optional image URL to delete from storage
+ * @returns {Promise<void>}
+ */
+export async function deleteProduct(productId, imageUrl = null) {
+    if (!USE_FIRESTORE) {
+        throw new Error('Firestore is required for deleting products')
+    }
+
+    try {
+        // Delete the product document
+        const productRef = doc(db, 'products', productId)
+        await deleteDoc(productRef)
+
+        // Note: Cloudinary images are not deleted automatically
+        // You can implement Cloudinary deletion using their API if needed
+        if (imageUrl && imageUrl.includes('cloudinary')) {
+            console.log('Note: Cloudinary image not deleted. Implement deletion if needed.')
+        }
+
+        // Clear cache to force refresh
+        clearProductsCache()
+    } catch (error) {
+        console.error('Error deleting product:', error)
+        throw error
+    }
 }

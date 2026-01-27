@@ -8,8 +8,10 @@ import {
     signInWithPopup
 } from "firebase/auth";
 import { auth, db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import LoadingScreen from "../components/LoadingScreen";
+import { getOrCreateUserProfile } from "../services/usersService";
+import { setCartUser, loadCartFromFirestore } from "../services/cartService";
 
 const AuthContext = createContext();
 
@@ -22,6 +24,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
+    const [userProfile, setUserProfile] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -35,19 +38,52 @@ export function AuthProvider({ children }) {
         }, 5000);
 
         const unsub = onAuthStateChanged(auth, async (currentUser) => {
+            console.log('🔐 Auth state changed:', currentUser?.email || 'No user');
+
             setUser(currentUser);
+            setUserProfile(null);
             setIsAdmin(false);
 
             if (currentUser) {
                 try {
-                    const adminDoc = await getDoc(doc(db, "admins", currentUser.uid));
-                    if (adminDoc.exists()) setIsAdmin(true);
+                    console.log('📝 Fetching user profile for:', currentUser.uid);
+
+                    // Get or create user profile in Firestore
+                    const profile = await getOrCreateUserProfile(currentUser.uid, {
+                        email: currentUser.email,
+                        name: currentUser.displayName || '',
+                        photoURL: currentUser.photoURL
+                    });
+
+                    console.log('✅ Profile loaded:', profile);
+                    console.log('👤 User role:', profile?.role);
+
+                    setUserProfile(profile);
+
+                    // Check if user is admin from profile role
+                    if (profile?.role === 'admin') {
+                        console.log('👑 USER IS ADMIN - Setting isAdmin to TRUE');
+                        setIsAdmin(true);
+                    } else {
+                        console.log('👤 User is not admin, checking admins collection...');
+                        // Fallback: check admins collection
+                        const adminDoc = await getDoc(doc(db, "admins", currentUser.uid));
+                        if (adminDoc.exists()) {
+                            console.log('👑 Found in admins collection - Setting isAdmin to TRUE');
+                            setIsAdmin(true);
+                        } else {
+                            console.log('❌ Not found in admins collection - isAdmin remains FALSE');
+                        }
+                    }
                 } catch (error) {
-                    // Silently handle offline errors - user is not admin if we can't check
-                    console.warn('Unable to check admin status (offline or network error):', error.message);
+                    console.error('❌ Error fetching user profile:', error);
+                    console.warn('Unable to fetch user profile:', error.message);
                 }
+            } else {
+                console.log('🚪 User logged out');
             }
 
+            console.log('✅ Auth loading complete');
             setLoading(false);
             clearTimeout(timeout);
         });
@@ -82,6 +118,7 @@ export function AuthProvider({ children }) {
     return (
         <AuthContext.Provider value={{
             user,
+            userProfile,
             isAdmin,
             loading,
             signup,

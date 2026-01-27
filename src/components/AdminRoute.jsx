@@ -4,28 +4,32 @@ import { useAuth } from '../context/AuthContext'
 function AdminRoute({ children }) {
     const { user, isAdmin, loading } = useAuth()
 
+    console.log('🛡️ AdminRoute check:', {
+        user: user?.email || 'No user',
+        isAdmin,
+        loading
+    });
+
+    // Show loading screen while checking auth
     if (loading) {
-        return (
-            <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: '100vh'
-            }}>
-                <div>Loading...</div>
-            </div>
-        )
+        return <LoadingScreen />;
     }
 
+    // Redirect to login if not authenticated
     if (!user) {
-        return <Navigate to="/login" replace />
+        console.log('AdminRoute: No user, redirecting to login');
+        return <Navigate to="/login" replace />;
     }
 
+    // Redirect to home if not admin
     if (!isAdmin) {
-        return <Navigate to="/" replace />
+        console.log('AdminRoute: User is not admin, redirecting to home');
+        return <Navigate to="/" replace />;
     }
 
-    return children
+    // User is admin, render the protected component
+    console.log('AdminRoute: User is admin, rendering admin panel');
+    return children;
 }
 
-export default AdminRoute
+export default AdminRoute;

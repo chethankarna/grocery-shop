@@ -1,0 +1,480 @@
+/* ==========================
+   Admin Panel – Mobile First
+   Clean • Smooth • Professional
+   ========================== */
+
+:root {
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --primary: #2563eb;
+    --success: #16a34a;
+    --warning: #f59e0b;
+    --danger: #dc2626;
+    --text: #111827;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --radius: 14px;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+}
+
+/* ---------- Layout ---------- */
+
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+/* ---------- View Switcher (Top Navigation) ---------- */
+
+.view-switcher {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.view-switcher button {
+    padding: 0.65rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.view-switcher button.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+/* ---------- Main Area ---------- */
+
+.admin-main {
+    flex: 1;
+    padding: 0;
+    /* No bottom padding needed - nav is at top */
+}
+
+.section-container {
+    max-width: 100%;
+    padding: 0.75rem;
+}
+
+.section-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.section-header h2 {
+    font-size: 1.2rem;
+    margin: 0;
+    color: var(--text);
+}
+
+/* ---------- Filters ---------- */
+
+.filter-pills {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+}
+
+.filter-pills button {
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: white;
+    font-size: 0.75rem;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.filter-pills button.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* ---------- Orders Grid ---------- */
+
+.orders-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+/* ---------- Order Card ---------- */
+
+.order-card-new {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 0.75rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: relative;
+}
+
+.order-card-new.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-tag {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+/* ---------- Status Select ---------- */
+
+.status-select-new {
+    padding: 0.35rem 0.6rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: white;
+    outline: none;
+}
+
+.status-select-new.new {
+    background: var(--primary);
+}
+
+.status-select-new.processing {
+    background: var(--warning);
+}
+
+.status-select-new.completed {
+    background: var(--success);
+}
+
+.status-select-new.cancelled {
+    background: var(--danger);
+}
+
+/* ---------- Card Body ---------- */
+
+.card-body h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text);
+}
+
+.card-body p {
+    margin: 0.15rem 0 0.4rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.item-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.mini-item {
+    background: #f1f5f9;
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    color: #334155;
+}
+
+/* ---------- Footer ---------- */
+
+.card-footer {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 0.85rem;
+    color: var(--text);
+}
+
+/* ---------- Inventory ---------- */
+
+.btn-add {
+    align-self: flex-start;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    font-size: 0.8rem;
+}
+
+.inventory-table th,
+.inventory-table td {
+    padding: 0.6rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+.inventory-table th {
+    background: #f8fafc;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.cat-badge {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.65rem;
+}
+
+.btn-edit {
+    padding: 0.35rem 0.7rem;
+    border-radius: 8px;
+    border: none;
+    background: #e5e7eb;
+    font-size: 0.7rem;
+    cursor: pointer;
+}
+
+
+/* ---------- Tablet & Desktop ---------- */
+
+@media (min-width: 768px) {
+    .section-container {
+        padding: 1.5rem;
+    }
+
+    .orders-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+
+    .view-switcher {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+}
+
+/* ========== INVENTORY MANAGEMENT STYLES ========== */
+
+.inventory-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.search-input,
+.category-filter {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.875rem;
+    background: white;
+    transition: all 0.2s;
+}
+
+.search-input:focus,
+.category-filter:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.table-container {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.inventory-table th {
+    background: #f8fafc;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 1rem 0.75rem;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+}
+
+.inventory-table td {
+    padding: 1rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.inventory-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.empty-state {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 3rem 1.5rem;
+    text-align: center;
+}
+
+.empty-state p {
+    margin: 0 0 1rem;
+    color: var(--muted);
+    font-size: 1rem;
+}
+
+.loading-state {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--muted);
+}
+
+/* Inventory Stats */
+.inventory-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.stat {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.stat-value.warning {
+    color: var(--warning);
+}
+
+.stat-value.danger {
+    color: var(--danger);
+}
+
+/* Button Variations */
+.btn-primary {
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.btn-secondary {
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    background: #f3f4f6;
+    color: var(--text);
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+/* Responsive adjustments for inventory */
+@media (min-width: 768px) {
+    .inventory-controls {
+        flex-direction: row;
+    }
+
+    .search-input {
+        flex: 1;
+    }
+
+    .category-filter {
+        min-width: 200px;
+    }
+
+    .section-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+@media (max-width: 640px) {
+    .inventory-table {
+        font-size: 0.75rem;
+    }
+
+    .inventory-table th,
+    .inventory-table td {
+        padding: 0.5rem;
+    }
+
+    .inventory-stats {
+        grid-template-columns: 1fr;
+    }
+}

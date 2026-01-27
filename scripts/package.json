@@ -1,0 +1,11 @@
+{
+    "name": "setup-admin",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "setup-admin": "node scripts/setup-admin.js"
+    },
+    "dependencies": {
+        "firebase": "^10.7.1"
+    }
+}

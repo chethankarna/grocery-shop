@@ -1,4 +1,4 @@
-import { addDoc, collection, serverTimestamp, runTransaction, doc } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, runTransaction, doc, query, where, orderBy, limit as limitQuery, getDocs, updateDoc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import { getProductPricing } from "./offersService";
 
@@ -29,6 +29,7 @@ export async function placeOrder(orderType, cart, user, customerDetails) {
         return {
             productId: item.id,
             name: item.name,
+            image: item.image || '', // Include product image
             qty: item.quantity,
             price: currentPrice,
             lineTotal: lineTotal,
@@ -107,6 +108,388 @@ export async function placeOrder(orderType, cart, user, customerDetails) {
  */
 export function canPlaceOrder(user) {
     return user && !user.isAnonymous;
+}
+
+/**
+ * Get user's order history
+ * @param {string} userId - User ID
+ * @param {number} limit - Number of orders to fetch (default 20)
+ * @returns {Promise<Array>} Array of orders
+ */
+export async function getUserOrders(userId, limit = 20) {
+    try {
+        const ordersRef = collection(db, "orders");
+        const q = query(
+            ordersRef,
+            where("userId", "==", userId),
+            orderBy("createdAt", "desc"),
+            limitQuery(limit)
+        );
+
+        const snapshot = await getDocs(q);
+        const orders = [];
+
+        snapshot.forEach(doc => {
+            orders.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+
+        return orders;
+    } catch (error) {
+        console.error('Error fetching user orders:', error);
+        throw new Error('Failed to fetch orders');
+    }
+}
+
+/**
+ * Get all orders (admin only)
+ * @param {number} limit - Number of orders to fetch (default 50)
+ * @param {string} statusFilter - Filter by status (optional)
+ * @returns {Promise<Array>} Array of all orders
+ */
+export async function getAllOrders(limit = 50, statusFilter = null) {
+    try {
+        const ordersRef = collection(db, "orders");
+
+        let q;
+        if (statusFilter) {
+            q = query(
+                ordersRef,
+                where("status", "==", statusFilter),
+                orderBy("createdAt", "desc"),
+                limitQuery(limit)
+            );
+        } else {
+            q = query(
+                ordersRef,
+                orderBy("createdAt", "desc"),
+                limitQuery(limit)
+            );
+        }
+
+        const snapshot = await getDocs(q);
+        const orders = [];
+
+        snapshot.forEach(doc => {
+            orders.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+
+        return orders;
+    } catch (error) {
+        console.error('Error fetching all orders:', error);
+        throw new Error('Failed to fetch orders');
+    }
+}
+
+/**
+ * Update order status (admin only)
+ * @param {string} orderId - Order ID
+ * @param {string} newStatus - New status ('NEW', 'PROCESSING', 'COMPLETED', 'CANCELLED')
+ * @returns {Promise<void>}
+ */
+export async function updateOrderStatus(orderId, newStatus) {
+    try {
+        const orderRef = doc(db, "orders", orderId);
+
+        await updateDoc(orderRef, {
+            status: newStatus,
+            updatedAt: serverTimestamp()
+        });
+
+        console.log(`✅ Order status updated to ${newStatus}:`, orderId);
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        throw new Error('Failed to update order status');
+    }
+}
+
+/**
+ * Get single order by ID
+ * @param {string} orderId - Order ID
+ * @returns {Promise<Object|null>} Order object or null
+ */
+export async function getOrderById(orderId) {
+    try {
+        const orderRef = doc(db, "orders", orderId);
+        const orderSnap = await getDoc(orderRef);
+
+        if (orderSnap.exists()) {
+            return {
+                id: orderSnap.id,
+                ...orderSnap.data()
+            };
+        }
+
+        return null;
+    } catch (error) {
+        console.error('Error fetching order:', error);
+        throw new Error('Failed to fetch order');
+    }
+}
+
+/**
+ * Listen to orders in realtime (admin only)
+ * Uses onSnapshot for live updates
+ * @param {Function} callback - Called with orders array on updates  
+ * @param {Object} filters - { status, limit }
+ * @returns {Function} unsubscribe function
+ */
+export function listenOrdersRealtime(callback, filters = {}) {
+    const { status, limit = 50 } = filters;
+
+    try {
+        const ordersRef = collection(db, "orders");
+        let q;
+
+        if (status && status !== 'ALL') {
+            q = query(
+                ordersRef,
+                where("status", "==", status),
+                orderBy("createdAt", "desc"),
+                limitQuery(limit)
+            );
+        } else {
+            q = query(
+                ordersRef,
+                orderBy("createdAt", "desc"),
+                limitQuery(limit)
+            );
+        }
+
+        const unsubscribe = onSnapshot(q,
+            (querySnapshot) => {
+                const orders = [];
+                querySnapshot.forEach((doc) => {
+                    orders.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                callback(orders);
+            },
+            (error) => {
+                console.error("Error listening to orders:", error);
+                callback([]);
+            }
+        );
+
+        return unsubscribe;
+    } catch (error) {
+        console.error("Error setting up realtime listener:", error);
+        return () => { }; // Return empty unsubscribe function
+    }
+}
+
+/**
+ * Listen to single order in realtime
+ * @param {string} orderId - Order ID
+ * @param {Function} callback - Called with order data on updates
+ * @returns {Function} unsubscribe function
+ */
+export function listenOrderRealtime(orderId, callback) {
+    try {
+        const orderRef = doc(db, "orders", orderId);
+
+        const unsubscribe = onSnapshot(orderRef,
+            (docSnapshot) => {
+                if (docSnapshot.exists()) {
+                    callback({
+                        id: docSnapshot.id,
+                        ...docSnapshot.data()
+                    });
+                } else {
+                    callback(null);
+                }
+            },
+            (error) => {
+                console.error("Error listening to order:", error);
+                callback(null);
+            }
+        );
+
+        return unsubscribe;
+    } catch (error) {
+        console.error("Error setting up order listener:", error);
+        return () => { };
+    }
+}
+
+/**
+ * Update admin notes for order (admin only)
+ * @param {string} orderId - Order ID
+ * @param {string} notes - Admin notes
+ * @returns {Promise<void>}
+ */
+export async function updateOrderNotes(orderId, notes) {
+    try {
+        const orderRef = doc(db, "orders", orderId);
+        await updateDoc(orderRef, {
+            notes: notes || '',
+            updatedAt: serverTimestamp()
+        });
+    } catch (error) {
+        console.error("Error updating order notes:", error);
+        throw new Error("Failed to update notes");
+    }
+}
+
+/**
+ * Search orders by customer name, phone, or order ID
+ * @param {string} searchTerm - Search term
+ * @returns {Promise<Array>} Matching orders
+ */
+export async function searchOrders(searchTerm) {
+    if (!searchTerm || searchTerm.trim().length < 2) {
+        return [];
+    }
+
+    try {
+        // Simple client-side search for now
+        const allOrders = await getAllOrders(200);
+
+        const lowercaseSearch = searchTerm.toLowerCase();
+        return allOrders.filter(order =>
+            order.id.toLowerCase().includes(lowercaseSearch) ||
+            order.customer_name?.toLowerCase().includes(lowercaseSearch) ||
+            order.customer_phone?.includes(searchTerm) ||
+            order.userEmail?.toLowerCase().includes(lowercaseSearch)
+        );
+    } catch (error) {
+        console.error("Error searching orders:", error);
+        return [];
+    }
+}
+
+/**
+ * Validate status transition
+ * @param {string} currentStatus - Current order status
+ * @param {string} newStatus - Proposed new status
+ * @returns {boolean} Whether transition is valid
+ */
+export function isValidStatusTransition(currentStatus, newStatus) {
+    const transitions = {
+        'NEW': ['PROCESSING', 'CANCELLED'],
+        'PROCESSING': ['COMPLETED', 'CANCELLED'],
+        'COMPLETED': [], // Final state
+        'CANCELLED': []  // Final state
+    };
+
+    return transitions[currentStatus]?.includes(newStatus) || false;
+}
+
+/**
+ * Get next available statuses for current status
+ * @param {string} currentStatus - Current order status
+ * @returns {Array<string>} Array of valid next statuses
+ */
+export function getNextStatuses(currentStatus) {
+    const transitions = {
+        'NEW': ['PROCESSING', 'CANCELLED'],
+        'PROCESSING': ['COMPLETED', 'CANCELLED'],
+        'COMPLETED': [],
+        'CANCELLED': []
+    };
+
+    return transitions[currentStatus] || [];
+}
+
+/**
+ * Listen to user's orders in realtime (for user order history)
+ * @param {string} userId - User ID
+ * @param {Function} callback - Called with orders array on updates
+ * @param {number} limitCount - Number of orders to fetch
+ * @returns {Function} unsubscribe function
+ */
+export function listenUserOrdersRealtime(userId, callback, limitCount = 20) {
+    try {
+        const ordersRef = collection(db, "orders");
+        const q = query(
+            ordersRef,
+            where("userId", "==", userId),
+            orderBy("createdAt", "desc"),
+            limitQuery(limitCount)
+        );
+
+        const unsubscribe = onSnapshot(q,
+            (querySnapshot) => {
+                const orders = [];
+                querySnapshot.forEach((doc) => {
+                    orders.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                callback(orders);
+            },
+            (error) => {
+                console.error("Error listening to user orders:", error);
+                callback([]);
+            }
+        );
+
+        return unsubscribe;
+    } catch (error) {
+        console.error("Error setting up user orders listener:", error);
+        return () => { };
+    }
+}
+
+/**
+ * Listen to all orders in realtime (admin only)
+ * Convenience wrapper for admin panel
+ * @param {Function} onSuccess - Called with orders array on updates
+ * @param {Function} onError - Called with error when listener fails
+ * @param {string} statusFilter - Optional status filter
+ * @returns {Function} unsubscribe function
+ */
+export function listenAdminOrdersRealtime(onSuccess, onError, statusFilter = null) {
+    try {
+        const ordersRef = collection(db, "orders");
+        let q;
+
+        if (statusFilter) {
+            q = query(
+                ordersRef,
+                where("status", "==", statusFilter),
+                orderBy("createdAt", "desc"),
+                limitQuery(100)
+            );
+        } else {
+            q = query(
+                ordersRef,
+                orderBy("createdAt", "desc"),
+                limitQuery(100)
+            );
+        }
+
+        const unsubscribe = onSnapshot(q,
+            (querySnapshot) => {
+                const orders = [];
+                querySnapshot.forEach((doc) => {
+                    orders.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                onSuccess(orders);
+            },
+            (error) => {
+                console.error("Error listening to admin orders:", error);
+                onError(error);
+            }
+        );
+
+        return unsubscribe;
+    } catch (error) {
+        console.error("Error setting up admin orders listener:", error);
+        onError(error);
+        return () => { };
+    }
 }
 
 export { DELIVERY_FEE };

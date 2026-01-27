@@ -4,7 +4,6 @@ import { getCart, clearCart } from '../services/cartService'
 import { submitOrder, createOrderObject, calculateTotals, DELIVERY_FEE } from '../services/orderService'
 import { placeOrder as placeFirestoreOrder } from '../services/ordersService'
 import { useAuth } from '../context/AuthContext'
-import { generateCheckoutMessage } from '../utils/whatsapp'
 import { formatCurrency } from '../utils/currency'
 import './Checkout.css'
 
@@ -152,7 +151,17 @@ function Checkout() {
             if (isCompleteUser()) {
                 try {
                     orderId = await placeFirestoreOrder(orderType, cart, user, customerDetails)
-                    console.log('Order placed in Firestore:', orderId)
+                    console.log('✅ Order placed in Firestore:', orderId)
+
+                    // Clear cart immediately after successful Firestore order
+                    clearCart()
+
+                    // Set success state
+                    const order = createOrderObject(cart, orderType, customerDetails)
+                    order.firestore_id = orderId
+                    setSubmittedOrder({ ...order, order_id: orderId })
+                    setStep('success')
+
                 } catch (firestoreError) {
                     console.error('Firestore order failed:', firestoreError)
                     setError(firestoreError.message)
@@ -167,15 +176,14 @@ function Checkout() {
                 order.firestore_id = orderId
             }
 
-            const result = await submitOrder(order)
-
-            if (result.success || orderId) {
-                setSubmittedOrder({ ...order, order_id: orderId || order.order_id })
-                setStep('success')
-                clearCart()
-            } else {
-                setError('Failed to submit order. Please try again or contact us via WhatsApp.')
+            try {
+                const result = await submitOrder(order)
+                console.log('📧 Order notification sent to Google Sheets')
+            } catch (sheetsError) {
+                // Google Sheets is just for notifications, so don't fail the order
+                console.warn('Google Sheets notification failed (non-critical):', sheetsError)
             }
+
         } catch (err) {
             console.error('Order submission error:', err)
             setError('An error occurred. Please try again.')
@@ -184,49 +192,68 @@ function Checkout() {
         }
     }
 
-    const handleWhatsAppNotify = () => {
-        const whatsappUrl = generateCheckoutMessage(submittedOrder)
-        window.open(whatsappUrl, '_blank')
-    }
+    const handleWhatsApp = () => {
+        const phoneNumber = '919876543210'; // Replace with your WhatsApp number
+        let message = `Hello, I just placed an order. My Order ID is ${submittedOrder?.order_id}.`;
+        if (submittedOrder?.order_type === 'PICKUP') {
+            message += ` I will pick it up on ${new Date(submittedOrder.pickupDatetime).toLocaleDateString()} at ${new Date(submittedOrder.pickupDatetime).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}.`;
+        } else if (submittedOrder?.order_type === 'DELIVERY') {
+            message += ` My delivery address is ${submittedOrder.deliveryAddress}.`;
+        }
+        message += ` Total amount: ${formatCurrency(submittedOrder?.total)}.`;
 
-    if (step === 'success') {
-        return (
-            <div className="checkout-page">
-                <div className="checkout-container">
-                    <div className="success-screen">
-                        <div className="success-icon">✓</div>
-                        <h1 className="success-title">Order Placed!</h1>
-                        <p className="success-message">
-                            Your order has been received. We'll prepare it and notify you shortly.
-                        </p>
-                        <div className="order-id">
-                            Order ID: {submittedOrder?.order_id}
-                        </div>
-
-                        <a
-                            href="#"
-                            onClick={(e) => { e.preventDefault(); handleWhatsAppNotify(); }}
-                            className="whatsapp-button"
-                        >
-                            <span>📱</span>
-                            <span>Notify on WhatsApp</span>
-                        </a>
-
-                        <button
-                            onClick={() => navigate('/')}
-                            className="back-button"
-                        >
-                            Continue Shopping
-                        </button>
-                    </div>
-                </div>
-            </div>
-        )
-    }
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+    };
 
     return (
         <div className="checkout-page">
             <div className="checkout-container">
+                {step === 'success' && submittedOrder && (
+                    <div className="success-container">
+                        <div className="success-icon">✓</div>
+                        <h2 className="success-title">Order Placed Successfully!</h2>
+
+                        <div className="order-summary">
+                            <div className="summary-row">
+                                <span className="summary-label">Order Type:</span>
+                                <span className="summary-value">
+                                    {submittedOrder.order_type === 'PICKUP' ? 'Pickup' : 'Home Delivery'}
+                                </span>
+                            </div>
+                            <div className="summary-row">
+                                <span className="summary-label">Total Amount:</span>
+                                <span className="summary-value">{formatCurrency(submittedOrder.total)}</span>
+                            </div>
+                            {submittedOrder.order_id && (
+                                <div className="summary-row">
+                                    <span className="summary-label">Order ID:</span>
+                                    <span className="summary-value">{submittedOrder.order_id}</span>
+                                </div>
+                            )}
+                            <p className="success-message">
+                                We'll contact you shortly to confirm your order details.
+                            </p>
+                        </div>
+
+                        <div className="success-actions">
+                            <button
+                                onClick={() => navigate('/')}
+                                className="back-home-button"
+                            >
+                                Back to Home
+                            </button>
+                            <button
+                                onClick={handleWhatsApp}
+                                className="whatsapp-button"
+                            >
+                                <span className="whatsapp-icon">💬</span>
+                                Contact on WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {/* Order Summary */}
                 <div className="checkout-header">
                     <h2 className="order-summary-title">Your Order ({cart.length} items)</h2>
