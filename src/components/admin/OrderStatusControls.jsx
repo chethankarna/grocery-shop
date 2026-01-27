@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { getNextStatuses, isValidStatusTransition } from '../../services/ordersService';
-import '../admin/AdminOrders.css';
+import '../../pages/admin/AdminOrders.css';
 
 function OrderStatusControls({ currentStatus, onStatusUpdate }) {
     const [updating, setUpdating] = useState(false);
