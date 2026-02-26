@@ -3,7 +3,8 @@ import { uploadProductImage } from '../services/productsService'
 import './ProductFormModal.css'
 
 function ProductFormModal({ isOpen, onClose, onSubmit, product = null, categories = [] }) {
-    const isEditMode = !!product
+    // Treat as edit mode only if product has an ID
+    const isEditMode = !!(product && product.id)
 
     const [formData, setFormData] = useState({
         name: '',
@@ -18,6 +19,8 @@ function ProductFormModal({ isOpen, onClose, onSubmit, product = null, categorie
 
     const [imageFile, setImageFile] = useState(null)
     const [imagePreview, setImagePreview] = useState(null)
+    const [categoryImageFile, setCategoryImageFile] = useState(null)
+    const [categoryImagePreview, setCategoryImagePreview] = useState(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
 
@@ -34,6 +37,7 @@ function ProductFormModal({ isOpen, onClose, onSubmit, product = null, categorie
                 visible: product.visible !== undefined ? product.visible : true
             })
             setImagePreview(product.image || null)
+            setCategoryImagePreview(product.categoryImage || null)
         } else {
             // Reset form for new product
             setFormData({
@@ -48,6 +52,8 @@ function ProductFormModal({ isOpen, onClose, onSubmit, product = null, categorie
             })
             setImagePreview(null)
             setImageFile(null)
+            setCategoryImagePreview(null)
+            setCategoryImageFile(null)
         }
         setError(null)
     }, [product, isOpen])
@@ -87,6 +93,33 @@ function ProductFormModal({ isOpen, onClose, onSubmit, product = null, categorie
         }
     }
 
+    const handleCategoryImageChange = (e) => {
+        const file = e.target.files[0]
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                setError('Please select a valid image file')
+                return
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                setError('Category image size should be less than 5MB')
+                return
+            }
+
+            setCategoryImageFile(file)
+
+            // Create preview
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setCategoryImagePreview(reader.result)
+            }
+            reader.readAsDataURL(file)
+            setError(null)
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError(null)
@@ -108,9 +141,17 @@ function ProductFormModal({ isOpen, onClose, onSubmit, product = null, categorie
 
             // Upload new image if selected
             if (imageFile) {
-                console.log('Uploading image...')
+                console.log('Uploading product image...')
                 imageUrl = await uploadProductImage(imageFile, product?.id)
-                console.log('Image uploaded:', imageUrl)
+                console.log('Product image uploaded:', imageUrl)
+            }
+
+            // Upload category image if selected
+            let categoryImageUrl = ''
+            if (categoryImageFile) {
+                console.log('Uploading category image...')
+                categoryImageUrl = await uploadProductImage(categoryImageFile, null)
+                console.log('Category image uploaded:', categoryImageUrl)
             }
 
             // Prepare product data
@@ -118,6 +159,7 @@ function ProductFormModal({ isOpen, onClose, onSubmit, product = null, categorie
                 name: formData.name.trim(),
                 description: formData.description.trim(),
                 category: formData.category.trim(),
+                categoryImage: categoryImageUrl || '',
                 price: parseFloat(formData.price),
                 originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
                 stock: parseInt(formData.stock) || 0,
@@ -180,6 +222,22 @@ function ProductFormModal({ isOpen, onClose, onSubmit, product = null, categorie
                                 rows="3"
                                 disabled={loading}
                             />
+                        </div>
+
+                        <div className="form-group full-width">
+                            <label htmlFor="categoryImage">Category Image (Optional)</label>
+                            <input
+                                type="file"
+                                id="categoryImage"
+                                accept="image/*"
+                                onChange={handleCategoryImageChange}
+                                disabled={loading}
+                            />
+                            {categoryImagePreview && (
+                                <div className="image-preview">
+                                    <img src={categoryImagePreview} alt="Category Preview" />
+                                </div>
+                            )}
                         </div>
 
                         <div className="form-group">

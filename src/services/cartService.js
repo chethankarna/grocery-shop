@@ -4,29 +4,17 @@ import {
     updateFirestoreCartQuantity,
     removeFromFirestoreCart,
     getFirestoreCart,
-    clearFirestoreCart,
-    incrementFirestoreCartItem,
-    decrementFirestoreCartItem
+    clearFirestoreCart
 } from './firestoreCartService'
 
 const CART_KEY = 'muchshop_cart'
 
-// Store current user for Firestore operations
 let currentUser = null
 
-/**
- * Set current user for cart synchronization
- * Call this from your auth context when user changes
- * @param {Object} user - Firebase user object
- */
 export function setCartUser(user) {
     currentUser = user
 }
 
-/**
- * Get current cart from localStorage
- * @returns {Array} Cart items
- */
 export function getCart() {
     try {
         const cart = localStorage.getItem(CART_KEY)
@@ -37,31 +25,21 @@ export function getCart() {
     }
 }
 
-/**
- * Save cart to localStorage and dispatch event
- * @param {Array} cart - Cart items
- */
 function saveCart(cart) {
     try {
         localStorage.setItem(CART_KEY, JSON.stringify(cart))
-        // Dispatch custom event for cart updates
         window.dispatchEvent(new Event('cartUpdated'))
     } catch (error) {
         console.error('Error saving cart:', error)
     }
 }
 
-/**
- * Load cart from Firestore for authenticated user
- * @returns {Promise<Array>} Cart items
- */
 export async function loadCartFromFirestore() {
     if (currentUser && !currentUser.isAnonymous) {
         try {
             const firestoreCart = await getFirestoreCart(currentUser.uid)
-            // Save to localStorage for quick access
-            saveCart(firestoreCart)
-            return firestoreCart
+            saveCart(firestoreCart || [])
+            return firestoreCart || []
         } catch (error) {
             console.error('Error loading cart from Firestore:', error)
             return getCart()
@@ -70,38 +48,31 @@ export async function loadCartFromFirestore() {
     return getCart()
 }
 
-/**
- * Add product to cart (uses discounted price if available)
- * @param {Object} product - Product object
- * @param {number} quantity - Quantity to add
- */
-export async function addToCart(product, quantity = 1) {
+export async function addToCart(product, quantity = 0) {
     const cart = getCart()
-    const existingItem = cart.find(item => item.id === product.id)
-
-    // Get the current price (discounted if available)
+    const existingItem = cart.find(item => String(item.id) === String(product.id))
     const pricing = getProductPricing(product)
 
     if (currentUser && !currentUser.isAnonymous) {
-        // Add to Firestore for authenticated users
         try {
-            await addToFirestoreCart(currentUser.uid, {
-                id: product.id,
-                name: product.name,
-                price: pricing.currentPrice,
-                image: product.image,
-                unit: product.unit
-            }, existingItem ? existingItem.quantity + quantity : quantity)
+            await addToFirestoreCart(
+                currentUser.uid,
+                {
+                    id: product.id,
+                    name: product.name,
+                    price: pricing.currentPrice,
+                    image: product.image,
+                    unit: product.unit
+                },
+                existingItem ? existingItem.quantity + quantity : quantity
+            )
 
-            // Reload from Firestore
             await loadCartFromFirestore()
         } catch (error) {
             console.error('Firestore add failed, using localStorage:', error)
-            // Fallback to localStorage
             addToLocalStorageCart(product, pricing, existingItem, quantity)
         }
     } else {
-        // Use localStorage for guests
         addToLocalStorageCart(product, pricing, existingItem, quantity)
     }
 }
@@ -109,9 +80,11 @@ export async function addToCart(product, quantity = 1) {
 function addToLocalStorageCart(product, pricing, existingItem, quantity) {
     const cart = getCart()
 
-    if (existingItem) {
-        existingItem.quantity += quantity
-        existingItem.price = pricing.currentPrice
+    const index = cart.findIndex(item => String(item.id) === String(product.id))
+
+    if (index !== -1) {
+        cart[index].quantity += quantity
+        cart[index].price = pricing.currentPrice
     } else {
         cart.push({
             id: product.id,
@@ -128,11 +101,6 @@ function addToLocalStorageCart(product, pricing, existingItem, quantity) {
     saveCart(cart)
 }
 
-/**
- * Update quantity of a cart item
- * @param {string} productId - Product ID
- * @param {number} newQuantity - New quantity
- */
 export async function updateQuantity(productId, newQuantity) {
     if (currentUser && !currentUser.isAnonymous) {
         try {
@@ -149,22 +117,18 @@ export async function updateQuantity(productId, newQuantity) {
 
 function updateLocalStorageQuantity(productId, newQuantity) {
     const cart = getCart()
-    const item = cart.find(item => item.id === productId)
+    const index = cart.findIndex(item => String(item.id) === String(productId))
 
-    if (item) {
+    if (index !== -1) {
         if (newQuantity <= 0) {
-            removeFromCart(productId)
+            removeFromLocalStorageCart(productId)
         } else {
-            item.quantity = newQuantity
+            cart[index].quantity = newQuantity
             saveCart(cart)
         }
     }
 }
 
-/**
- * Remove item from cart
- * @param {string} productId - Product ID
- */
 export async function removeFromCart(productId) {
     if (currentUser && !currentUser.isAnonymous) {
         try {
@@ -180,43 +144,30 @@ export async function removeFromCart(productId) {
 }
 
 function removeFromLocalStorageCart(productId) {
-    const cart = getCart().filter(item => item.id !== productId)
-    saveCart(cart)
-    return cart
+    const cart = getCart()
+    const updatedCart = cart.filter(item => String(item.id) !== String(productId))
+    saveCart(updatedCart)
+    return updatedCart
 }
 
-/**
- * Clear entire cart
- */
 export async function clearCart() {
     if (currentUser && !currentUser.isAnonymous) {
         try {
             await clearFirestoreCart(currentUser.uid)
-            saveCart([])
         } catch (error) {
             console.error('Firestore clear failed, clearing localStorage:', error)
-            saveCart([])
         }
-    } else {
-        saveCart([])
     }
+    saveCart([])
     return []
 }
 
-/**
- * Get cart total amount
- * @returns {number} Total amount
- */
 export function getCartTotal() {
     const cart = getCart()
-    return cart.reduce((total, item) => total + (item.price * item.quantity), 0)
+    return cart.reduce((total, item) => total + (Number(item.price) * Number(item.quantity)), 0)
 }
 
-/**
- * Get total number of items in cart
- * @returns {number} Total item count
- */
 export function getCartItemCount() {
     const cart = getCart()
-    return cart.reduce((count, item) => count + item.quantity, 0)
+    return cart.reduce((count, item) => count + Number(item.quantity), 0)
 }

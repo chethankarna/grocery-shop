@@ -29,10 +29,10 @@ function ProductRow({ product, onEdit, onDelete }) {
                     </div>
                 </div>
             </td>
-            <td>
+            <td data-label="Category">
                 <span className="category-badge">{product.category}</span>
             </td>
-            <td>
+            <td data-label="Price">
                 <div className="price-cell">
                     <span className="current-price">₹{product.price?.toFixed(2)}</span>
                     {product.originalPrice && product.originalPrice > product.price && (
@@ -40,12 +40,12 @@ function ProductRow({ product, onEdit, onDelete }) {
                     )}
                 </div>
             </td>
-            <td>
+            <td data-label="Stock">
                 <span className={`stock-badge ${isLowStock ? 'low-stock' : ''}`}>
                     {product.stock}
                 </span>
             </td>
-            <td>
+            <td data-label="Visibility">
                 <span className={`visibility-badge ${product.visible ? 'visible' : 'hidden'}`}>
                     {product.visible ? '✓ Visible' : '✗ Hidden'}
                 </span>
@@ -68,7 +68,7 @@ function ProductRow({ product, onEdit, onDelete }) {
                     </button>
                 </div>
             </td>
-        </tr>
+        </tr >
     )
 }
 

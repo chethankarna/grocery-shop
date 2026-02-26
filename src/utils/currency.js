@@ -3,8 +3,12 @@
  * @param {number} amount - Amount in rupees
  * @returns {string} Formatted currency string
  */
-export function formatCurrency(amount) {
-    return `₹${parseFloat(amount).toFixed(0)}`
+export function formatCurrency(amount = 0) {
+    return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 2
+    }).format(amount);
 }
 
 /**

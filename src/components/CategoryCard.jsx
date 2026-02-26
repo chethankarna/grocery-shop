@@ -22,7 +22,17 @@ function CategoryCard({ category }) {
             }}
             aria-label={`Browse ${category.name} - ${category.productCount} products`}
         >
-            <div className="category-icon">{category.icon}</div>
+            <div className="category-icon">
+                {category.image ? (
+                    <img
+                        src={category.image}
+                        alt={category.name}
+                        className="category-image"
+                    />
+                ) : (
+                    <span className="category-emoji">{category.icon}</span>
+                )}
+            </div>
             <div className="category-info">
                 <h3 className="category-name">{category.name}</h3>
                 <p className="category-description">{category.description}</p>

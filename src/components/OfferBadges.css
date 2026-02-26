@@ -1,54 +1,33 @@
+/* ============================================
+   OFFER BADGES - Mobile-First
+   ============================================ */
+
 .offer-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.375rem;
-    margin-bottom: 0.5rem;
+    gap: 4px;
 }
 
 .offer-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.6875rem;
-    font-weight: 700;
-    color: var(--badge-color, #333);
-    background-color: var(--badge-bg, #F3F4F6);
-    border: 1px solid color-mix(in srgb, var(--badge-color, #333) 20%, transparent);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-    transition: transform 0.2s ease;
+    gap: 3px;
+    padding: 3px 6px;
+    border-radius: var(--radius-xs);
+    font-size: 10px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-accent);
+    background-color: var(--color-accent-light);
     white-space: nowrap;
     line-height: 1;
 }
 
-.offer-badge:hover {
-    transform: translateY(-1px);
-}
-
 .offer-icon {
-    font-size: 0.875rem;
+    font-size: 10px;
     line-height: 1;
 }
 
 .offer-label {
     text-transform: uppercase;
-    letter-spacing: 0.025em;
-}
-
-/* Responsive */
-@media (max-width: 640px) {
-    .offer-badges {
-        gap: 0.25rem;
-        margin-bottom: 0.375rem;
-    }
-
-    .offer-badge {
-        padding: 0.1875rem 0.4375rem;
-        font-size: 0.625rem;
-    }
-
-    .offer-icon {
-        font-size: 0.875rem;
-    }
+    letter-spacing: 0.3px;
 }

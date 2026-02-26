@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getProductById } from '../services/productsService'
-import { addToCart } from '../services/cartService'
+import { addToCart, updateQuantity, removeFromCart, getCart } from '../services/cartService'
 import { getProductPricing } from '../services/offersService'
-import QuantitySelector from '../components/QuantitySelector'
 import PriceDisplay from '../components/PriceDisplay'
 import OfferBadges from '../components/OfferBadges'
 import WishlistButton from '../components/WishlistButton'
@@ -15,8 +14,19 @@ function Product() {
     const navigate = useNavigate()
     const [product, setProduct] = useState(null)
     const [loading, setLoading] = useState(true)
-    const [quantity, setQuantity] = useState(1)
-    const [showAddFeedback, setShowAddFeedback] = useState(false)
+    const [isInCart, setIsInCart] = useState(false)
+    const [cartQuantity, setCartQuantity] = useState(0)
+    const [busy, setBusy] = useState(false) // prevent rapid-click races
+
+    // Sync local state from cart
+    const syncCart = useCallback((prod) => {
+        const p = prod || product
+        if (!p) return
+        const cart = getCart()
+        const item = cart.find(i => String(i.id) === String(p.id))
+        setIsInCart(!!item)
+        setCartQuantity(item ? Number(item.quantity) : 0)
+    }, [product])
 
     useEffect(() => {
         const loadProduct = async () => {
@@ -25,8 +35,12 @@ function Product() {
                 const productData = await getProductById(id)
                 if (productData) {
                     setProduct(productData)
+                    // Sync cart state once product is loaded
+                    const cart = getCart()
+                    const item = cart.find(i => String(i.id) === String(productData.id))
+                    setIsInCart(!!item)
+                    setCartQuantity(item ? Number(item.quantity) : 0)
                 } else {
-                    // Product not found
                     setTimeout(() => navigate('/'), 2000)
                 }
             } catch (error) {
@@ -35,25 +49,52 @@ function Product() {
                 setLoading(false)
             }
         }
-
         loadProduct()
     }, [id, navigate])
 
-    const handleAddToCart = () => {
-        addToCart(product, quantity)
-        setShowAddFeedback(true)
-        setTimeout(() => setShowAddFeedback(false), 2000)
+    // Keep in sync whenever cart changes from any source
+    useEffect(() => {
+        const handleCartUpdate = () => syncCart()
+        window.addEventListener('cartUpdated', handleCartUpdate)
+        return () => window.removeEventListener('cartUpdated', handleCartUpdate)
+    }, [syncCart])
+
+    const handleAdd = async () => {
+        if (!product || busy) return
+        setBusy(true)
+        await addToCart(product, 1)
+        syncCart(product)
+        setBusy(false)
     }
 
+    const handleIncrease = async () => {
+        if (!product || busy) return
+        setBusy(true)
+        const next = cartQuantity + 1
+        await updateQuantity(String(product.id), next)
+        syncCart(product)
+        setBusy(false)
+    }
 
+    const handleDecrease = async () => {
+        if (!product || busy) return
+        setBusy(true)
+        if (cartQuantity <= 1) {
+            await removeFromCart(String(product.id))
+        } else {
+            await updateQuantity(String(product.id), cartQuantity - 1)
+        }
+        syncCart(product)
+        setBusy(false)
+    }
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white">
-                <div className="max-w-3xl mx-auto px-4 py-6">
-                    <div className="aspect-square bg-neutral-100 rounded-card mb-6 skeleton"></div>
-                    <div className="h-8 bg-neutral-100 rounded mb-4 skeleton w-3/4"></div>
-                    <div className="h-6 bg-neutral-100 rounded mb-6 skeleton w-1/2"></div>
+            <div className="product-page loading">
+                <div className="product-container container">
+                    <div className="loading-skeleton skeleton-image"></div>
+                    <div className="loading-skeleton skeleton-title"></div>
+                    <div className="loading-skeleton skeleton-text"></div>
                 </div>
             </div>
         )
@@ -61,142 +102,149 @@ function Product() {
 
     if (!product) {
         return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="text-center">
-                    <div className="text-6xl mb-4">❌</div>
-                    <h2 className="text-2xl font-bold text-text-primary mb-2">
-                        Product Not Found
-                    </h2>
-                    <p className="text-text-secondary mb-4">
-                        Redirecting to home page...
-                    </p>
+            <div className="product-page not-found">
+                <div className="status-container text-center">
+                    <div className="status-icon">❌</div>
+                    <h2 className="status-title">Product Not Found</h2>
+                    <p className="status-message">Redirecting to home page...</p>
                 </div>
             </div>
         )
     }
 
     const isOutOfStock = product.stock <= 0
+    const pricing = getProductPricing(product)
 
     return (
-        <div className="min-h-screen bg-white pb-6">
-            <div className="max-w-3xl mx-auto">
-                {/* Product Image */}
-                <div className="relative aspect-square bg-neutral-100 mb-6">
-                    <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                            e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23f0f0f0" width="400" height="400"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23999" font-family="sans-serif" font-size="20"%3ENo image%3C/text%3E%3C/svg%3E'
-                        }}
-                    />
+        <div className="product-page">
+            <div className="product-container container">
+                {/* Product Image Section */}
+                <div className="product-image-section">
+                    <div className="product-image-wrapper">
+                        <img
+                            src={product.image}
+                            alt={product.name}
+                            className="product-image"
+                            onError={(e) => {
+                                e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23f0f0f0" width="400" height="400"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23999" font-family="sans-serif" font-size="20"%3ENo image%3C/text%3E%3C/svg%3E'
+                            }}
+                        />
 
-                    {/* Wishlist Button */}
-                    {!isOutOfStock && (
-                        <div className="absolute top-4 right-4 z-10">
-                            <WishlistButton productId={product.id} size="large" />
-                        </div>
-                    )}
+                        {/* Overlays */}
+                        {!isOutOfStock && (
+                            <div className="wishlist-overlay">
+                                <WishlistButton productId={product.id} size="large" />
+                            </div>
+                        )}
 
-                    {isOutOfStock && (
-                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                            <span className="text-white font-bold text-xl bg-red-500 px-6 py-2 rounded-full">
-                                Out of Stock
-                            </span>
-                        </div>
-                    )}
+                        {isOutOfStock && (
+                            <div className="out-of-stock-overlay">
+                                <span className="badge badge--danger badge--large">
+                                    Out of Stock
+                                </span>
+                            </div>
+                        )}
+                    </div>
 
-                    {/* Back Button */}
+                    {/* Back Button Floating */}
                     <button
                         onClick={() => navigate(-1)}
-                        className="absolute top-4 left-4 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-text-primary hover:bg-neutral-100"
+                        className="btn-floating back-btn"
                         aria-label="Go back"
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="icon-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
                 </div>
 
-                <div className="px-4">
-                    {/* Product Info */}
-                    <div className="mb-6">
-                        {/* Offer Badges */}
-                        <div className="mb-3">
+                {/* Product Info Section */}
+                <div className="product-info-section animate-fade-in-up">
+                    <div className="product-core-info">
+                        <div className="badge-group mb-xs">
                             <OfferBadges product={product} maxBadges={3} />
                         </div>
 
-                        <div className="flex items-start justify-between mb-2">
-                            <h1 className="text-2xl font-bold text-text-primary flex-1">
-                                {product.name}
-                            </h1>
+                        <div className="product-title-row">
+                            <h1 className="product-title">{product.name}</h1>
                             {product.stock > 0 && product.stock <= 10 && (
-                                <span className="text-sm text-orange-500 font-medium bg-orange-50 px-3 py-1 rounded-full ml-2">
+                                <span className="stock-warning">
                                     Only {product.stock} left
                                 </span>
                             )}
                         </div>
 
-                        {/* Price Display */}
-                        <div className="mb-4">
+                        <div className="price-section mb-md">
                             <PriceDisplay product={product} size="large" />
                         </div>
 
                         {product.description && (
-                            <p className="text-text-secondary leading-relaxed mb-4">
-                                {product.description}
-                            </p>
+                            <div className="product-description-card card mb-md">
+                                <h3 className="section-subtitle mb-xs">About this product</h3>
+                                <p className="description-text">{product.description}</p>
+                            </div>
                         )}
 
-                        <div className="flex items-center space-x-4 text-sm">
-                            <div className="flex items-center text-text-secondary">
-                                <span className="font-medium mr-1">Category:</span>
-                                <span className="text-primary font-medium">{product.category}</span>
+                        <div className="product-meta-grid">
+                            <div className="meta-item">
+                                <span className="meta-label">Category</span>
+                                <span className="meta-value">{product.category}</span>
                             </div>
                             {!isOutOfStock && (
-                                <div className="flex items-center text-text-secondary">
-                                    <span className="font-medium mr-1">In Stock:</span>
-                                    <span className="text-primary font-medium">{product.stock}</span>
+                                <div className="meta-item">
+                                    <span className="meta-label">Availability</span>
+                                    <span className="meta-value text-accent-teal">In Stock ({product.stock})</span>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    {!isOutOfStock && (
-                        <>
-                            {/* Quantity Selector */}
-                            <div className="mb-6">
-                                <label className="block text-sm font-medium text-text-primary mb-3">
-                                    Quantity
-                                </label>
-                                <QuantitySelector
-                                    initialQuantity={quantity}
-                                    min={1}
-                                    max={Math.min(product.stock, 99)}
-                                    onChange={setQuantity}
-                                />
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="space-y-3">
+                    {/* Action Panel */}
+                    {!isOutOfStock ? (
+                        <div className="product-action-panel card">
+                            {isInCart ? (
+                                /* ── Zepto-style inline qty control ── */
+                                <div className="cart-qty-control">
+                                    <button
+                                        className="cart-qty-btn cart-qty-btn--minus"
+                                        onClick={handleDecrease}
+                                        disabled={busy}
+                                        aria-label="Decrease quantity"
+                                    >
+                                        −
+                                    </button>
+                                    <span className="cart-qty-value">{cartQuantity}</span>
+                                    <button
+                                        className="cart-qty-btn cart-qty-btn--plus"
+                                        onClick={handleIncrease}
+                                        disabled={busy}
+                                        aria-label="Increase quantity"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            ) : (
+                                /* ── Not in cart: simple Add button ── */
                                 <button
-                                    onClick={handleAddToCart}
-                                    className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                                    style={{ minHeight: '52px' }}
+                                    onClick={handleAdd}
+                                    disabled={busy}
+                                    className="btn btn--primary btn--large w-full"
                                 >
-                                    {showAddFeedback ? '✓ Added to Cart!' : `Add to Cart - ${formatCurrency(getProductPricing(product).currentPrice * quantity)} `}
+                                    {busy ? 'Adding…' : `Add to Cart • ${formatCurrency(pricing.currentPrice)}`}
                                 </button>
-
-
-                            </div>
-                        </>
-                    )}
-
-                    {isOutOfStock && (
-                        <div className="text-center py-8">
-                            <p className="text-text-secondary text-lg">
-                                This product is currently out of stock. Please check back later.
+                            )}
+                        </div>
+                    ) : (
+                        <div className="out-of-stock-notice card">
+                            <p className="notice-text">
+                                This product is currently out of stock. Please check back later or browse similar items.
                             </p>
+                            <button
+                                onClick={() => navigate('/')}
+                                className="btn btn--secondary w-full"
+                            >
+                                Back to Shop
+                            </button>
                         </div>
                     )}
                 </div>

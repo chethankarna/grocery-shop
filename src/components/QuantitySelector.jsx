@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
+import './QuantitySelector.css'
 
 function QuantitySelector({
     initialQuantity = 1,
-    min = 1,
+    min = 0,
     max = 99,
     onChange,
     disabled = false
@@ -14,14 +15,19 @@ function QuantitySelector({
     }, [initialQuantity])
 
     const handleDecrease = () => {
-        if (quantity > min) {
-            const newQuantity = quantity - 1
+        if (disabled) return
+
+        const newQuantity = quantity - 1
+
+        if (newQuantity >= min) {
             setQuantity(newQuantity)
             onChange?.(newQuantity)
         }
     }
 
     const handleIncrease = () => {
+        if (disabled) return
+
         if (quantity < max) {
             const newQuantity = quantity + 1
             setQuantity(newQuantity)
@@ -30,20 +36,28 @@ function QuantitySelector({
     }
 
     const handleInputChange = (e) => {
-        const value = parseInt(e.target.value) || min
+        if (disabled) return
+
+        const value = parseInt(e.target.value)
+
+        if (isNaN(value)) {
+            setQuantity(min)
+            onChange?.(min)
+            return
+        }
+
         const newQuantity = Math.min(Math.max(value, min), max)
         setQuantity(newQuantity)
         onChange?.(newQuantity)
     }
 
     return (
-        <div className="flex items-center space-x-2">
+        <div className="quantity-selector">
             <button
                 onClick={handleDecrease}
-                disabled={disabled || quantity <= min}
-                className="w-11 h-11 flex items-center justify-center bg-neutral-100 hover:bg-neutral-200 disabled:bg-neutral-50 disabled:text-neutral-400 rounded-lg font-bold text-xl transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+                disabled={disabled}
+                className="quantity-btn"
                 aria-label="Decrease quantity"
-                style={{ minHeight: '44px', minWidth: '44px' }}
             >
                 −
             </button>
@@ -55,16 +69,15 @@ function QuantitySelector({
                 value={quantity}
                 onChange={handleInputChange}
                 disabled={disabled}
-                className="w-16 h-11 text-center font-semibold text-lg border-2 border-neutral-200 rounded-lg focus:outline-none focus:border-primary disabled:bg-neutral-50"
+                className="quantity-input"
                 aria-label="Quantity"
             />
 
             <button
                 onClick={handleIncrease}
                 disabled={disabled || quantity >= max}
-                className="w-11 h-11 flex items-center justify-center bg-neutral-100 hover:bg-neutral-200 disabled:bg-neutral-50 disabled:text-neutral-400 rounded-lg font-bold text-xl transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+                className="quantity-btn"
                 aria-label="Increase quantity"
-                style={{ minHeight: '44px', minWidth: '44px' }}
             >
                 +
             </button>

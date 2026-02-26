@@ -1,59 +1,70 @@
-/* Home Page Styles */
+/* ============================================
+   HOME PAGE - Mobile-First Premium
+   ============================================ */
+
 .home-page {
     min-height: 100vh;
-    background-color: #FAFAFA;
+    background-color: var(--color-bg);
+    padding-bottom: calc(var(--nav-height) + var(--space-xl));
 }
 
+/* ============================================
+   HERO SECTION
+   ============================================ */
 .hero-section {
-    background-color: #F9F7F4;
-    padding: 2.5rem 1rem;
-    margin-bottom: 1.5rem;
-    border-bottom-left-radius: 32px;
-    border-bottom-right-radius: 32px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-    animation: fadeIn 0.4s ease-out forwards;
+    background-color: var(--color-bg-card);
+    padding: var(--space-xl) var(--page-padding-x);
+    border-bottom: 1px solid var(--color-border-light);
 }
 
 .hero-container {
-    max-width: 80rem;
+    max-width: var(--container-max-width);
     margin: 0 auto;
 }
 
 .hero-subtitle {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #2D2D2D;
-    margin-bottom: 0.5rem;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    margin-bottom: 4px;
 }
 
 .hero-title {
-    font-size: 2.25rem;
-    font-weight: 800;
-    color: #2D2D2D;
-    margin-bottom: 0.75rem;
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-xs);
+    line-height: var(--line-height-heading);
 }
 
 .hero-description {
-    color: #6B6B6B;
-    font-size: 1rem;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body);
 }
 
+/* ============================================
+   CONTENT AREA
+   ============================================ */
 .home-content {
-    max-width: 80rem;
+    max-width: var(--container-max-width);
     margin: 0 auto;
-    padding: 0 1rem 1.5rem;
+    padding: var(--space-lg) var(--page-padding-x) 0;
 }
 
+/* ============================================
+   CATEGORIES SECTION
+   ============================================ */
 .categories-section {
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-xl);
 }
 
 .categories-scroll {
     display: flex;
-    gap: 0.75rem;
+    gap: var(--space-xs);
     overflow-x: auto;
-    padding-bottom: 0.5rem;
+    padding-bottom: var(--space-xs);
     scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
 }
 
 .categories-scroll::-webkit-scrollbar {
@@ -65,109 +76,146 @@
     scrollbar-width: none;
 }
 
+/* ============================================
+   PRODUCTS SECTION
+   ============================================ */
 .products-section {
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-2xl);
 }
 
 .section-title {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: #2D2D2D;
-    margin-bottom: 1rem;
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-md);
 }
 
+/* Single column on narrow mobile, 2 columns on wider */
 .products-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
 }
 
+@media (min-width: 400px) {
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm);
+    }
+}
+
+/* ============================================
+   LOADING SKELETON
+   ============================================ */
 .loading-skeleton {
-    background-color: #F9F7F4;
-    border-radius: 24px;
-    height: 20rem;
-    animation: shimmer 1.5s ease-in-out infinite;
-    background: linear-gradient(to right, #f7f7f7 8%, #e8e8e8 18%, #f7f7f7 33%);
-    background-size: 800px 104px;
+    background: linear-gradient(90deg,
+            var(--color-surface) 25%,
+            var(--color-muted) 50%,
+            var(--color-surface) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-md);
+    height: 120px;
+}
+
+@media (min-width: 400px) {
+    .loading-skeleton {
+        height: 220px;
+    }
 }
 
 @keyframes shimmer {
     0% {
-        background-position: -468px 0;
+        background-position: -200% 0;
     }
 
     100% {
-        background-position: 468px 0;
+        background-position: 200% 0;
     }
 }
 
+/* ============================================
+   EMPTY STATE
+   ============================================ */
 .empty-state {
     text-align: center;
-    padding: 4rem 0;
-    animation: fadeIn 0.4s ease-out forwards;
+    padding: var(--space-3xl) var(--space-lg);
 }
 
 .empty-state-icon {
-    font-size: 3.75rem;
-    line-height: 1;
-    margin-bottom: 1rem;
+    font-size: 48px;
+    margin-bottom: var(--space-md);
 }
 
 .empty-state-text {
-    color: #6B6B6B;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body);
 }
 
+/* ============================================
+   QUICK INFO SECTION
+   ============================================ */
 .quick-info-section {
-    margin-top: 3rem;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1rem;
-    animation: fadeIn 0.4s ease-out forwards;
-}
-
-@media (min-width: 640px) {
-    .quick-info-section {
-        grid-template-columns: repeat(3, 1fr);
-    }
+    gap: var(--space-sm);
+    margin-top: var(--space-xl);
 }
 
 .info-card {
     text-align: center;
-    padding: 1.25rem;
-    background-color: #F9F7F4;
-    border-radius: 24px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.info-card:hover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: var(--space-lg);
+    background-color: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-light);
 }
 
 .info-icon {
-    font-size: 2.25rem;
-    margin-bottom: 0.75rem;
+    font-size: 28px;
+    margin-bottom: var(--space-xs);
 }
 
 .info-title {
-    font-weight: 700;
-    color: #2D2D2D;
-    margin-bottom: 0.25rem;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
 }
 
 .info-description {
-    font-size: 0.875rem;
-    color: #6B6B6B;
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
 }
 
-@keyframes fadeIn {
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+.animate-fade-in-up {
+    animation: fadeInUp var(--transition-medium) var(--easing-smooth) both;
+}
+
+@keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(12px);
     }
 
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (min-width: 480px) {
+    .quick-info-section {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .hero-section {
+        padding: var(--space-2xl) var(--page-padding-x);
     }
 }

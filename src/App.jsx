@@ -28,14 +28,12 @@ const AdminOrderDetails = lazy(() => import('./pages/admin/AdminOrderDetails'))
 function AppContent() {
     const location = useLocation()
 
-    // Hide main bottom nav on admin routes
-    const isAdminRoute = location.pathname.startsWith('/admin')
     return (
         <WishlistProvider>
             <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#FFFFFF' }}>
                 <Header />
 
-                <main style={{ flex: 1, paddingBottom: isAdminRoute ? '0' : '5rem' }}>
+                <main style={{ flex: 1 }}>
                     <Routes>
                         {/* PUBLIC ROUTES */}
                         <Route path="/" element={<Home />} />
@@ -85,8 +83,7 @@ function AppContent() {
                     </Routes>
                 </main>
 
-                {/* Hide main bottom nav on admin routes */}
-                {!isAdminRoute && <BottomNav />}
+                <BottomNav />
             </div>
         </WishlistProvider>
     )

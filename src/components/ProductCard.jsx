@@ -61,14 +61,23 @@ function ProductCard({ product, showAddButton = true }) {
                     {product.name}
                 </h3>
 
+                {/* Weight/Unit Meta */}
+                {product.unit && (
+                    <div className="product-meta">
+                        1{product.unit}
+                    </div>
+                )}
+
                 {/* Price Display */}
                 <PriceDisplay product={product} size="normal" />
-
-                {/* Inline Quantity Selector */}
-                {showAddButton && (
-                    <InlineQuantitySelector product={product} />
-                )}
             </div>
+
+            {/* Floating Add Button - Positioned in image area */}
+            {showAddButton && !isOutOfStock && (
+                <div className="product-floating-add">
+                    <InlineQuantitySelector product={product} variant="floating" />
+                </div>
+            )}
         </article>
     )
 }

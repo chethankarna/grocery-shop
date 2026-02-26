@@ -12,7 +12,8 @@ import {
     query,
     where,
     orderBy,
-    serverTimestamp
+    serverTimestamp,
+    writeBatch
 } from 'firebase/firestore'
 
 // Apps Script URL from environment variable (legacy support)
@@ -111,8 +112,25 @@ export async function fetchProducts() {
  * @returns {Promise<Object|null>} Product object or null
  */
 export async function getProductById(id) {
-    const products = await fetchProducts()
-    return products.find(p => p.id === id) || null
+    try {
+        if (!id) return null;
+
+        // Try to fetch specific document directly (much more efficient)
+        const productRef = doc(db, 'products', id);
+        const productSnap = await getDoc(productRef);
+
+        if (productSnap.exists()) {
+            return {
+                id: productSnap.id,
+                ...productSnap.data()
+            };
+        }
+
+        return null;
+    } catch (error) {
+        console.error('Error getting product by ID:', error);
+        return null;
+    }
 }
 
 /**
@@ -181,9 +199,10 @@ export function listenProductsRealtime(callback, errorCallback) {
 
     try {
         const productsRef = collection(db, 'products')
-        // Note: Using orderBy requires a Firestore index
-        // For now, we'll fetch without ordering to avoid delays
-        const q = query(productsRef)
+
+        // Order by updatedAtdescending so recently modified products show first
+        // Note: This might require a composite index if mixed with 'where' clauses later
+        const q = query(productsRef, orderBy('updatedAt', 'desc'))
 
         const unsubscribe = onSnapshot(
             q,
@@ -354,6 +373,46 @@ export async function deleteProduct(productId, imageUrl = null) {
         clearProductsCache()
     } catch (error) {
         console.error('Error deleting product:', error)
+        throw error
+    }
+}
+
+/**
+ * Batch update products category
+ * @param {string} oldCategory 
+ * @param {string} newCategory 
+ */
+export async function updateProductsCategory(oldCategory, newCategory) {
+    if (!oldCategory || !newCategory || oldCategory === newCategory) return
+
+    try {
+        console.log(`Batch updating products from "${oldCategory}" to "${newCategory}"`)
+        const productsRef = collection(db, 'products')
+        const q = query(productsRef, where('category', '==', oldCategory))
+        const snapshot = await getDocs(q)
+
+        console.log(`Found ${snapshot.size} products to update`)
+
+        if (snapshot.empty) return
+
+        // Firestore batch limit is 500
+        const batch = writeBatch(db)
+        let count = 0
+
+        snapshot.docs.forEach(doc => {
+            batch.update(doc.ref, {
+                category: newCategory,
+                updatedAt: serverTimestamp()
+            })
+            count++
+        })
+
+        await batch.commit()
+        console.log(`Successfully updated ${count} products`)
+
+        clearProductsCache()
+    } catch (error) {
+        console.error('Error batch updating products:', error)
         throw error
     }
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
 import { getProductsByCategory, fetchProducts, getCategories } from '../services/productsService'
+import './Category.css'
 
 function Category() {
     const { slug } = useParams()
@@ -13,6 +14,7 @@ function Category() {
         const loadProducts = async () => {
             try {
                 setLoading(true)
+                console.log('Category slug from URL:', slug)
 
                 if (slug === 'all') {
                     // Show all products
@@ -22,15 +24,22 @@ function Category() {
                 } else {
                     // Convert slug back to category name
                     const categories = await getCategories()
+                    console.log('Available categories:', categories)
+                    console.log('Looking for slug:', slug)
+
                     const matchedCategory = categories.find(
                         cat => cat.toLowerCase().replace(/\s+/g, '-') === slug
                     )
 
+                    console.log('Matched category:', matchedCategory)
+
                     if (matchedCategory) {
                         const categoryProducts = await getProductsByCategory(matchedCategory)
+                        console.log('Products found:', categoryProducts.length)
                         setProducts(categoryProducts)
                         setCategoryName(matchedCategory)
                     } else {
+                        console.error('No matching category found for slug:', slug)
                         setProducts([])
                         setCategoryName('Unknown Category')
                     }
@@ -47,40 +56,42 @@ function Category() {
     }, [slug])
 
     return (
-        <div className="min-h-screen bg-white">
-            <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="category-page">
+            <div className="category-container">
                 {/* Category Header */}
-                <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-text-primary mb-2">
+                <header className="category-header">
+                    <h1 className="category-title">
                         {categoryName}
                     </h1>
                     {!loading && (
-                        <p className="text-text-secondary">
+                        <p className="category-description">
                             {products.length} {products.length === 1 ? 'product' : 'products'} available
                         </p>
                     )}
-                </div>
+                </header>
 
                 {/* Products Grid */}
                 {loading ? (
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="products-grid">
                         {[...Array(6)].map((_, i) => (
-                            <div key={i} className="bg-neutral-100 rounded-card h-72 skeleton"></div>
+                            <div key={i} className="loading-skeleton"></div>
                         ))}
                     </div>
                 ) : products.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-4">
-                        {products.map((product) => (
-                            <ProductCard key={product.id} product={product} />
+                    <div className="products-grid">
+                        {products.map((product, index) => (
+                            <div key={product.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
+                                <ProductCard product={product} />
+                            </div>
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-16">
-                        <div className="text-6xl mb-4">📦</div>
-                        <h3 className="text-xl font-semibold text-text-primary mb-2">
+                    <div className="empty-state">
+                        <div className="empty-icon">📦</div>
+                        <h3 className="empty-title">
                             No products found
                         </h3>
-                        <p className="text-text-secondary">
+                        <p className="empty-description">
                             This category doesn't have any products yet.
                         </p>
                     </div>

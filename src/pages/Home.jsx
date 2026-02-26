@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
 import CategoryBadge from '../components/CategoryBadge'
 import { fetchProducts, getCategories, searchProducts } from '../services/productsService'
+import './Home.css'
 
 function Home() {
     const [searchParams] = useSearchParams()
@@ -64,29 +65,29 @@ function Home() {
     const displayProducts = searchQuery ? searchResults : popularProducts
 
     return (
-        <div className="min-h-screen bg-neutral-50">
+        <div className="home-page">
             {/* Hero Banner */}
             {!searchQuery && (
-                <section className="bg-cream-100 px-4 py-10 mb-6 rounded-b-3xl shadow-soft animate-fade-in">
-                    <div className="max-w-7xl mx-auto">
-                        <h2 className="text-2xl font-bold text-text-primary mb-2">
+                <section className="hero-section">
+                    <div className="hero-container">
+                        <h2 className="hero-subtitle">
                             Welcome to
                         </h2>
-                        <h1 className="text-4xl font-extrabold text-text-primary mb-3">
+                        <h1 className="hero-title">
                             Much Shop హాయ్ నా పెరు చేతన్
                         </h1>
-                        <p className="text-text-secondary text-base">
+                        <p className="hero-description">
                             Get your daily needs
                         </p>
                     </div>
                 </section>
             )}
 
-            <div className="max-w-7xl mx-auto px-4 pb-6">
+            <div className="home-content">
                 {/* Categories Section */}
                 {!searchQuery && (
-                    <section className="mb-8">
-                        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
+                    <section className="categories-section">
+                        <div className="categories-scroll scrollbar-hide">
                             {categories.map((category) => (
                                 <CategoryBadge key={category} category={category} />
                             ))}
@@ -95,31 +96,31 @@ function Home() {
                 )}
 
                 {/* Products Section */}
-                <section>
-                    <h3 className="text-lg font-bold text-text-primary mb-4">
+                <section className="products-section">
+                    <h3 className="section-title">
                         {searchQuery
                             ? `Search results for "${searchQuery}"`
                             : 'Popular Products'}
                     </h3>
 
                     {loading || isSearching ? (
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="products-grid">
                             {[...Array(6)].map((_, i) => (
-                                <div key={i} className="bg-cream-100 rounded-2xl h-80 skeleton"></div>
+                                <div key={i} className="loading-skeleton"></div>
                             ))}
                         </div>
                     ) : displayProducts.length > 0 ? (
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="products-grid">
                             {displayProducts.map((product, index) => (
-                                <div key={product.id} style={{ animationDelay: `${index * 50}ms` }}>
+                                <div key={product.id} style={{ animationDelay: `${index * 50}ms` }} className="animate-fade-in-up">
                                     <ProductCard product={product} />
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-16 animate-fade-in">
-                            <div className="text-6xl mb-4">🔍</div>
-                            <p className="text-text-secondary">
+                        <div className="empty-state">
+                            <div className="empty-state-icon">🔍</div>
+                            <p className="empty-state-text">
                                 {searchQuery
                                     ? 'No products found. Try a different search term.'
                                     : 'No products available yet.'}
@@ -130,36 +131,25 @@ function Home() {
 
                 {/* Quick Info */}
                 {!searchQuery && (
-                    <section className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 animate-fade-in">
-                        <div className="text-center p-5 bg-cream-100 rounded-2xl shadow-soft hover:shadow-card transition-all duration-300">
-                            <div className="text-4xl mb-3">🚚</div>
-                            <h4 className="font-bold text-text-primary mb-1">Fast Delivery</h4>
-                            <p className="text-sm text-text-secondary">Same day delivery available</p>
+                    <section className="quick-info-section">
+                        <div className="info-card">
+                            <div className="info-icon">🚚</div>
+                            <h4 className="info-title">Fast Delivery</h4>
+                            <p className="info-description">Same day delivery available</p>
                         </div>
-                        <div className="text-center p-5 bg-cream-100 rounded-2xl shadow-soft hover:shadow-card transition-all duration-300">
-                            <div className="text-4xl mb-3">✅</div>
-                            <h4 className="font-bold text-text-primary mb-1">Fresh Quality</h4>
-                            <p className="text-sm text-text-secondary">100% fresh guarantee</p>
+                        <div className="info-card">
+                            <div className="info-icon">✅</div>
+                            <h4 className="info-title">Fresh Quality</h4>
+                            <p className="info-description">100% fresh guarantee</p>
                         </div>
-                        <div className="text-center p-5 bg-cream-100 rounded-2xl shadow-soft hover:shadow-card transition-all duration-300">
-                            <div className="text-4xl mb-3">💬</div>
-                            <h4 className="font-bold text-text-primary mb-1">Easy Ordering</h4>
-                            <p className="text-sm text-text-secondary">Order via WhatsApp</p>
+                        <div className="info-card">
+                            <div className="info-icon">💬</div>
+                            <h4 className="info-title">Easy Ordering</h4>
+                            <p className="info-description">Order via WhatsApp</p>
                         </div>
                     </section>
                 )}
             </div>
-
-            {/* Custom scrollbar hide */}
-            <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
         </div>
     )
 }

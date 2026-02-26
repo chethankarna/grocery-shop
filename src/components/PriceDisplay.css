@@ -1,35 +1,33 @@
-/* PriceDisplay - Modern Blinkit/Zepto Style */
-
 /* ============================================
-   PRICE DISPLAY CONTAINER
+   PRICE DISPLAY - Mobile-First
    ============================================ */
+
 .price-display {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
 /* ============================================
-   CURRENT PRICE (Prominent)
+   CURRENT PRICE
    ============================================ */
 .price-current {
     display: flex;
     align-items: baseline;
     gap: 4px;
-    line-height: 1;
 }
 
 .price-amount {
-    font-size: 16px;
-    font-weight: 700;
-    color: #10B880;
-    letter-spacing: -0.2px;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    letter-spacing: -0.3px;
 }
 
 .price-unit {
-    font-size: 13px;
-    font-weight: 500;
-    color: #6B7280;
+    font-size: var(--font-size-tiny);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-tertiary);
 }
 
 /* ============================================
@@ -38,103 +36,45 @@
 .price-original {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-xs);
 }
 
 .price-strikethrough {
-    font-size: 13px;
-    font-weight: 500;
-    color: #9CA3AF;
+    font-size: var(--font-size-tiny);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-tertiary);
     text-decoration: line-through;
-    text-decoration-thickness: 1px;
 }
 
 .price-discount-badge {
-    font-size: 11px;
-    font-weight: 600;
-    color: #10B880;
-    background: #ECFDF5;
+    font-size: 10px;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-accent);
+    background: var(--color-accent-light);
     padding: 2px 6px;
-    border-radius: 4px;
-    letter-spacing: 0.2px;
+    border-radius: var(--radius-xs);
 }
 
 /* ============================================
    SIZE VARIANTS
    ============================================ */
-/* Small size (for compact views) */
+
+/* Small */
 .price-display--small .price-amount {
-    font-size: 14px;
+    font-size: var(--font-size-small);
 }
 
-.price-display--small .price-unit {
-    font-size: 11px;
-}
-
-.price-display--small .price-strikethrough {
-    font-size: 11px;
-}
-
-.price-display--small .price-discount-badge {
-    font-size: 10px;
-    padding: 1px 4px;
-}
-
-/* Large size (for detail views) */
+/* Large (product detail page) */
 .price-display--large .price-amount {
-    font-size: 20px;
+    font-size: var(--font-size-h2);
 }
 
-.price-display--large .price-unit {
-    font-size: 15px;
-}
-
+.price-display--large .price-unit,
 .price-display--large .price-strikethrough {
-    font-size: 15px;
+    font-size: var(--font-size-small);
 }
 
 .price-display--large .price-discount-badge {
-    font-size: 12px;
+    font-size: var(--font-size-tiny);
     padding: 3px 8px;
-}
-
-/* ============================================
-   MOBILE OPTIMIZATIONS
-   ============================================ */
-@media (max-width: 420px) {
-    .price-amount {
-        font-size: 15px;
-    }
-
-    .price-unit {
-        font-size: 12px;
-    }
-
-    .price-strikethrough {
-        font-size: 12px;
-    }
-
-    .price-discount-badge {
-        font-size: 10px;
-        padding: 2px 5px;
-    }
-}
-
-@media (max-width: 360px) {
-    .price-amount {
-        font-size: 14px;
-    }
-
-    .price-unit {
-        font-size: 11px;
-    }
-
-    .price-strikethrough {
-        font-size: 11px;
-    }
-
-    .price-discount-badge {
-        font-size: 9px;
-        padding: 1px 4px;
-    }
 }

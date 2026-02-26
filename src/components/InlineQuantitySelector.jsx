@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { getCart, addToCart, updateQuantity, removeFromCart } from '../services/cartService'
 import './InlineQuantitySelector.css'
 
-function InlineQuantitySelector({ product }) {
+function InlineQuantitySelector({ product, variant = 'default' }) {
     const [quantity, setQuantity] = useState(0)
     const [isRemoving, setIsRemoving] = useState(false)
 
@@ -53,21 +53,29 @@ function InlineQuantitySelector({ product }) {
 
     // Show ADD button when not in cart
     if (quantity === 0 && !isRemoving) {
+        const buttonClass = isOutOfStock
+            ? 'out-of-stock-button'
+            : variant === 'floating'
+                ? 'add-button-floating'
+                : 'add-button-transform';
+
         return (
             <button
                 onClick={handleAdd}
                 disabled={isOutOfStock}
-                className={isOutOfStock ? 'out-of-stock-button' : 'add-button-transform'}
+                className={buttonClass}
                 aria-label={`Add ${product.name} to cart`}
             >
-                {isOutOfStock ? 'Out of Stock' : 'ADD'}
+                {variant === 'floating' ? '+' : (isOutOfStock ? 'Out of Stock' : 'ADD')}
             </button>
         )
     }
 
     // Show inline quantity selector when in cart
+    const selectorClass = `inline-quantity-selector ${variant === 'floating' ? 'inline-quantity-selector--floating' : ''} ${isRemoving ? 'removing' : ''}`;
+
     return (
-        <div className={`inline-quantity-selector ${isRemoving ? 'removing' : ''}`}>
+        <div className={selectorClass}>
             <button
                 onClick={handleDecrement}
                 className="inline-qty-button"

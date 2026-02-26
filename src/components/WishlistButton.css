@@ -1,8 +1,7 @@
-/* Wishlist Button - Animated Heart Toggle */
-
 /* ============================================
-   BUTTON CONTAINER
+   WISHLIST BUTTON - Premium Minimal
    ============================================ */
+
 .wishlist-button {
     background: transparent;
     border: none;
@@ -11,7 +10,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease;
+    transition: transform var(--transition-short) var(--easing-smooth);
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -27,44 +26,31 @@
    HEART ICON
    ============================================ */
 .wishlist-icon {
-    width: 18px;
-    height: 18px;
-    color: #6B7280;
-    /* Gray when inactive */
-    transition: all 0.2s ease;
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-tertiary);
+    /* Soft gray when inactive */
+    transition: all var(--transition-medium) var(--easing-smooth);
     will-change: transform, color;
 }
 
-/* Active state - Red and slightly smaller */
-.wishlist-button:has(svg[fill="currentColor"]) .wishlist-icon {
+/* Active state (filled heart) */
+.wishlist-button .wishlist-icon[fill="currentColor"] {
     color: #EF4444;
-    /* Red when active */
-    transform: scale(0.3);
-    /* Slightly smaller (from 18px to ~16px) */
-}
-
-/* Alternative selector for active state */
-svg.wishlist-icon[fill="currentColor"] {
-    color: #EF4444;
-    transform: scale(0.88);
+    /* Keep the red for the heart as it's standard */
+    transform: scale(0.9);
 }
 
 /* Hover effect on inactive heart */
-.wishlist-button:hover .wishlist-icon {
-    color: #EF4444;
-}
-
-/* Keep red color on hover when already active */
-.wishlist-button:hover svg.wishlist-icon[fill="currentColor"] {
-    color: #DC2626;
-    /* Darker red on hover */
+.wishlist-button:hover .wishlist-icon:not([fill="currentColor"]) {
+    color: #F87171;
 }
 
 /* ============================================
-   ANIMATION ON TOGGLE
+   ANIMATION
    ============================================ */
 .wishlist-button--animating {
-    animation: heartPulse 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: heartPulse 0.3s var(--easing-smooth);
 }
 
 @keyframes heartPulse {
@@ -73,7 +59,7 @@ svg.wishlist-icon[fill="currentColor"] {
     }
 
     50% {
-        transform: scale(1.2);
+        transform: scale(1.25);
     }
 
     100% {
@@ -89,43 +75,20 @@ svg.wishlist-icon[fill="currentColor"] {
     height: 16px;
 }
 
-.wishlist-button--small:has(svg[fill="currentColor"]) .wishlist-icon {
-    transform: scale(0.875);
-    /* From 16px to 14px */
-}
-
 .wishlist-button--large .wishlist-icon {
-    width: 20px;
-    height: 20px;
-}
-
-.wishlist-button--large:has(svg[fill="currentColor"]) .wishlist-icon {
-    transform: scale(0.9);
-    /* From 20px to 18px */
+    width: 24px;
+    height: 24px;
 }
 
 /* ============================================
-   ACCESSIBILITY
+   RESPONSIVE & ACCESSIBILITY
    ============================================ */
 .wishlist-button:focus-visible {
-    outline: 2px solid #EF4444;
-    outline-offset: 2px;
-    border-radius: 4px;
+    outline: 2px solid var(--color-accent-teal);
+    outline-offset: 4px;
+    border-radius: var(--radius-xs);
 }
 
-@media (prefers-reduced-motion: reduce) {
-
-    .wishlist-icon,
-    .wishlist-button,
-    .wishlist-button--animating {
-        animation: none;
-        transition: none;
-    }
-}
-
-/* ============================================
-   MOBILE TOUCH OPTIMIZATION
-   ============================================ */
 @media (hover: none) and (pointer: coarse) {
     .wishlist-button {
         min-width: 44px;
@@ -137,6 +100,6 @@ svg.wishlist-icon[fill="currentColor"] {
     }
 
     .wishlist-button:active {
-        transform: scale(0.95);
+        transform: scale(0.92);
     }
 }

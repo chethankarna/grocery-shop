@@ -208,252 +208,236 @@ function Checkout() {
 
     return (
         <div className="checkout-page">
-            <div className="checkout-container">
-                {step === 'success' && submittedOrder && (
-                    <div className="success-container">
-                        <div className="success-icon">✓</div>
-                        <h2 className="success-title">Order Placed Successfully!</h2>
+            <div className="checkout-container container">
+                {step === 'success' && submittedOrder ? (
+                    <div className="success-view animate-fade-in-up">
+                        <div className="success-card card text-center">
+                            <div className="success-icon-wrapper">
+                                <div className="success-icon">✓</div>
+                            </div>
+                            <h2 className="success-title">Order Placed Successfully!</h2>
 
-                        <div className="order-summary">
-                            <div className="summary-row">
-                                <span className="summary-label">Order Type:</span>
-                                <span className="summary-value">
-                                    {submittedOrder.order_type === 'PICKUP' ? 'Pickup' : 'Home Delivery'}
-                                </span>
+                            <div className="order-receipt card shadow-none bg-muted mb-xl">
+                                <div className="receipt-row">
+                                    <span className="receipt-label">Order Type</span>
+                                    <span className="receipt-value">
+                                        {submittedOrder.order_type === 'PICKUP' ? 'Pickup' : 'Home Delivery'}
+                                    </span>
+                                </div>
+                                <div className="receipt-row">
+                                    <span className="receipt-label">Total Amount</span>
+                                    <span className="receipt-value text-accent-teal">{formatCurrency(submittedOrder.total)}</span>
+                                </div>
+                                {submittedOrder.order_id && (
+                                    <div className="receipt-row">
+                                        <span className="receipt-label">Order ID</span>
+                                        <span className="receipt-value font-mono">{submittedOrder.order_id}</span>
+                                    </div>
+                                )}
+                                <p className="receipt-note text-small mt-sm">
+                                    We'll contact you shortly to confirm your order details.
+                                </p>
                             </div>
-                            <div className="summary-row">
-                                <span className="summary-label">Total Amount:</span>
-                                <span className="summary-value">{formatCurrency(submittedOrder.total)}</span>
+
+                            <div className="success-actions">
+                                <button
+                                    onClick={() => navigate('/')}
+                                    className="btn btn--secondary w-full"
+                                >
+                                    Continue Shopping
+                                </button>
+                                <button
+                                    onClick={handleWhatsApp}
+                                    className="btn btn--success w-full mt-sm"
+                                >
+                                    <span className="mr-xs">💬</span> Contact on WhatsApp
+                                </button>
                             </div>
-                            {submittedOrder.order_id && (
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        {/* Order Progress & Summary Header */}
+                        <div className="checkout-summary-header card mb-xl">
+                            <div className="summary-header-row mb-md">
+                                <h2 className="summary-title">Order Summary ({cart.length} items)</h2>
+                                <button onClick={() => navigate('/cart')} className="btn-link text-small">Edit Cart</button>
+                            </div>
+
+                            <div className="summary-details">
                                 <div className="summary-row">
-                                    <span className="summary-label">Order ID:</span>
-                                    <span className="summary-value">{submittedOrder.order_id}</span>
+                                    <span className="summary-label">Subtotal</span>
+                                    <span className="summary-value">{formatCurrency(subtotal)}</span>
                                 </div>
-                            )}
-                            <p className="success-message">
-                                We'll contact you shortly to confirm your order details.
-                            </p>
-                        </div>
-
-                        <div className="success-actions">
-                            <button
-                                onClick={() => navigate('/')}
-                                className="back-home-button"
-                            >
-                                Back to Home
-                            </button>
-                            <button
-                                onClick={handleWhatsApp}
-                                className="whatsapp-button"
-                            >
-                                <span className="whatsapp-icon">💬</span>
-                                Contact on WhatsApp
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {/* Order Summary */}
-                <div className="checkout-header">
-                    <h2 className="order-summary-title">Your Order ({cart.length} items)</h2>
-                    <div className="order-summary-row">
-                        <span>Subtotal</span>
-                        <span>{formatCurrency(subtotal)}</span>
-                    </div>
-                    {orderType === 'DELIVERY' && (
-                        <div className="order-summary-row">
-                            <span>Delivery Fee</span>
-                            <span>{formatCurrency(deliveryFee)}</span>
-                        </div>
-                    )}
-                    <div className="order-summary-total">
-                        <span>Total</span>
-                        <span>{formatCurrency(total)}</span>
-                    </div>
-                </div>
-
-                {error && (
-                    <div className="error-message">{error}</div>
-                )}
-
-                {step === 'select' && (
-                    <div className="checkout-options">
-                        <div
-                            className={`checkout-option ${orderType === 'PICKUP' ? 'selected' : ''}`}
-                            onClick={() => handleSelectOption('PICKUP')}
-                        >
-                            <div className="option-icon">📦</div>
-                            <h3 className="option-title">Pickup by Time</h3>
-                            <p className="option-description">
-                                Choose a convenient time to pick up your order from our store
-                            </p>
-                        </div>
-
-                        <div
-                            className={`checkout-option ${orderType === 'DELIVERY' ? 'selected' : ''}`}
-                            onClick={() => handleSelectOption('DELIVERY')}
-                        >
-                            <div className="option-icon">🏠</div>
-                            <h3 className="option-title">Home Delivery</h3>
-                            <p className="option-description">
-                                Get your order delivered to your doorstep (₹{DELIVERY_FEE} delivery fee)
-                            </p>
-                        </div>
-                    </div>
-                )}
-
-                {step === 'pickup' && (
-                    <>
-                        <button onClick={handleBack} className="back-button">
-                            ← Change Option
-                        </button>
-
-                        <div className="checkout-form">
-                            <h3 className="option-title" style={{ marginBottom: '1.5rem' }}>
-                                📦 Pickup Details
-                            </h3>
-
-                            <div className="form-group">
-                                <label className="form-label">Your Name *</label>
-                                <input
-                                    type="text"
-                                    className="form-input"
-                                    value={customerName}
-                                    onChange={(e) => setCustomerName(e.target.value)}
-                                    placeholder="Enter your name"
-                                />
+                                {orderType === 'DELIVERY' && (
+                                    <div className="summary-row">
+                                        <span className="summary-label">Delivery Fee</span>
+                                        <span className="summary-value">{formatCurrency(deliveryFee)}</span>
+                                    </div>
+                                )}
+                                <div className="summary-row total-row pt-sm mt-sm">
+                                    <span className="summary-label text-bold">Total</span>
+                                    <span className="summary-value text-accent-teal text-h2">{formatCurrency(total)}</span>
+                                </div>
                             </div>
+                        </div>
 
-                            <div className="form-group">
-                                <label className="form-label">Phone Number *</label>
-                                <input
-                                    type="tel"
-                                    className="form-input"
-                                    value={customerPhone}
-                                    onChange={(e) => setCustomerPhone(e.target.value)}
-                                    placeholder="10-digit mobile number"
-                                    maxLength={10}
-                                />
+                        {error && (
+                            <div className="alert alert--danger mb-xl">
+                                <span className="alert-icon">⚠️</span>
+                                <span className="alert-message">{error}</span>
                             </div>
+                        )}
 
-                            <div className="form-group">
-                                <label className="form-label">Pickup Date *</label>
-                                <input
-                                    type="date"
-                                    className="form-input"
-                                    value={pickupDate}
-                                    onChange={(e) => setPickupDate(e.target.value)}
-                                    min={new Date().toISOString().split('T')[0]}
-                                />
+                        {step === 'select' && (
+                            <div className="checkout-step step-select animate-fade-in-up">
+                                <h3 className="step-title mb-lg">Choose How to Receive Your Order</h3>
+                                <div className="options-grid">
+                                    <div
+                                        className={`option-card card clickable ${orderType === 'PICKUP' ? 'is-selected' : ''}`}
+                                        onClick={() => handleSelectOption('PICKUP')}
+                                    >
+                                        <div className="option-visual">📦</div>
+                                        <div className="option-content">
+                                            <h4 className="option-name">Store Pickup</h4>
+                                            <p className="option-desc">Choose a convenient time to collect from store</p>
+                                        </div>
+                                        <div className="option-badge text-accent-teal">FREE</div>
+                                    </div>
+
+                                    <div
+                                        className={`option-card card clickable ${orderType === 'DELIVERY' ? 'is-selected' : ''}`}
+                                        onClick={() => handleSelectOption('DELIVERY')}
+                                    >
+                                        <div className="option-visual">🏠</div>
+                                        <div className="option-content">
+                                            <h4 className="option-name">Home Delivery</h4>
+                                            <p className="option-desc">Delivered to your doorstep</p>
+                                        </div>
+                                        <div className="option-badge">{formatCurrency(DELIVERY_FEE)}</div>
+                                    </div>
+                                </div>
                             </div>
+                        )}
 
-                            <div className="form-group">
-                                <label className="form-label">Pickup Time * (at least {PREP_TIME_MINUTES} min from now)</label>
-                                <div className="time-slots">
-                                    {getAvailableTimeSlots().map(slot => (
+                        {(step === 'pickup' || step === 'delivery') && (
+                            <div className="checkout-step step-details animate-fade-in-up">
+                                <div className="step-header mb-lg">
+                                    <button onClick={handleBack} className="btn-back mb-sm">
+                                        ← Back to options
+                                    </button>
+                                    <h3 className="step-title">
+                                        {step === 'pickup' ? '📦 Pickup Details' : '🏠 Delivery Details'}
+                                    </h3>
+                                </div>
+
+                                <div className="checkout-form card">
+                                    <div className="form-section">
+                                        <h4 className="section-subtitle mb-md">Personal Information</h4>
+                                        <div className="form-group mb-md">
+                                            <label className="input-label">Your Full Name</label>
+                                            <input
+                                                type="text"
+                                                className="input-field"
+                                                value={customerName}
+                                                onChange={(e) => setCustomerName(e.target.value)}
+                                                placeholder="e.g. Rahul Sharma"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="form-group mb-md">
+                                            <label className="input-label">Mobile Number</label>
+                                            <input
+                                                type="tel"
+                                                className="input-field"
+                                                value={customerPhone}
+                                                onChange={(e) => setCustomerPhone(e.target.value)}
+                                                placeholder="10-digit mobile number"
+                                                maxLength={10}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <hr className="divider mb-lg" />
+
+                                    {step === 'pickup' ? (
+                                        <div className="form-section">
+                                            <h4 className="section-subtitle mb-md">Scheduling</h4>
+                                            <div className="form-group mb-md">
+                                                <label className="input-label">Pickup Date</label>
+                                                <input
+                                                    type="date"
+                                                    className="input-field"
+                                                    value={pickupDate}
+                                                    onChange={(e) => setPickupDate(e.target.value)}
+                                                    min={new Date().toISOString().split('T')[0]}
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label className="input-label mb-xs d-block">Available Time Slots</label>
+                                                <p className="text-tiny text-tertiary mb-sm">Earliest available after {PREP_TIME_MINUTES} mins preparation</p>
+                                                <div className="time-slots-grid">
+                                                    {getAvailableTimeSlots().map(slot => (
+                                                        <button
+                                                            key={slot.value}
+                                                            className={`slot-chip ${pickupTime === slot.value ? 'is-active' : ''}`}
+                                                            onClick={() => setPickupTime(slot.value)}
+                                                            disabled={slot.disabled}
+                                                        >
+                                                            {slot.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="form-section">
+                                            <h4 className="section-subtitle mb-md">Delivery Address</h4>
+                                            <div className="form-group mb-md">
+                                                <label className="input-label">Full Address</label>
+                                                <textarea
+                                                    className="textarea-field"
+                                                    value={deliveryAddress}
+                                                    onChange={(e) => setDeliveryAddress(e.target.value)}
+                                                    placeholder="House/Flat no, Street, Area, Landmark"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="info-banner bg-muted p-sm rounded-sm mb-md">
+                                                <span className="mr-xs">🚚</span>
+                                                <span className="text-small text-secondary">A delivery fee of {formatCurrency(DELIVERY_FEE)} is included.</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <hr className="divider mb-lg" />
+
+                                    <div className="form-section">
+                                        <div className="form-group mb-xl">
+                                            <label className="input-label">Special Instructions (Optional)</label>
+                                            <textarea
+                                                className="textarea-field"
+                                                value={notes}
+                                                onChange={(e) => setNotes(e.target.value)}
+                                                placeholder="Any landmarks or delivery instructions?"
+                                            />
+                                        </div>
+
                                         <button
-                                            key={slot.value}
-                                            className={`time-slot ${pickupTime === slot.value ? 'selected' : ''}`}
-                                            onClick={() => setPickupTime(slot.value)}
-                                            disabled={slot.disabled}
+                                            onClick={handleSubmit}
+                                            disabled={loading}
+                                            className={`btn btn--primary btn--large w-full ${loading ? 'is-loading' : ''}`}
                                         >
-                                            {slot.label}
+                                            {loading ? 'Processing Order...' : `Confirm & Place Order • ${formatCurrency(total)}`}
                                         </button>
-                                    ))}
+                                    </div>
                                 </div>
                             </div>
-
-                            <div className="form-group">
-                                <label className="form-label">Special Instructions (Optional)</label>
-                                <textarea
-                                    className="form-textarea"
-                                    value={notes}
-                                    onChange={(e) => setNotes(e.target.value)}
-                                    placeholder="Any special requests?"
-                                />
-                            </div>
-
-                            <button
-                                onClick={handleSubmit}
-                                disabled={loading}
-                                className="submit-button"
-                            >
-                                {loading ? 'Placing Order...' : `Confirm Pickup - ${formatCurrency(total)}`}
-                            </button>
-                        </div>
-                    </>
-                )}
-
-                {step === 'delivery' && (
-                    <>
-                        <button onClick={handleBack} className="back-button">
-                            ← Change Option
-                        </button>
-
-                        <div className="checkout-form">
-                            <h3 className="option-title" style={{ marginBottom: '1.5rem' }}>
-                                🏠 Delivery Details
-                            </h3>
-
-                            <div className="form-group">
-                                <label className="form-label">Your Name *</label>
-                                <input
-                                    type="text"
-                                    className="form-input"
-                                    value={customerName}
-                                    onChange={(e) => setCustomerName(e.target.value)}
-                                    placeholder="Enter your name"
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label">Phone Number *</label>
-                                <input
-                                    type="tel"
-                                    className="form-input"
-                                    value={customerPhone}
-                                    onChange={(e) => setCustomerPhone(e.target.value)}
-                                    placeholder="10-digit mobile number"
-                                    maxLength={10}
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label">Delivery Address *</label>
-                                <textarea
-                                    className="form-textarea"
-                                    value={deliveryAddress}
-                                    onChange={(e) => setDeliveryAddress(e.target.value)}
-                                    placeholder="House/Flat no, Street, Landmark, Area, City, PIN"
-                                />
-                            </div>
-
-                            <div className="delivery-fee-info">
-                                <div className="delivery-fee-icon">🚚</div>
-                                <div className="delivery-fee-text">
-                                    Delivery fee of {formatCurrency(DELIVERY_FEE)} will be added to your order
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label">Special Instructions (Optional)</label>
-                                <textarea
-                                    className="form-textarea"
-                                    value={notes}
-                                    onChange={(e) => setNotes(e.target.value)}
-                                    placeholder="Any special requests?"
-                                />
-                            </div>
-
-                            <button
-                                onClick={handleSubmit}
-                                disabled={loading}
-                                className="submit-button"
-                            >
-                                {loading ? 'Placing Order...' : `Confirm Delivery - ${formatCurrency(total)}`}
-                            </button>
-                        </div>
+                        )}
                     </>
                 )}
             </div>

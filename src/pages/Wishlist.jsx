@@ -44,11 +44,13 @@ function Wishlist() {
     if (loading) {
         return (
             <div className="wishlist-page">
-                <div className="wishlist-container">
-                    <h1 className="wishlist-title">Saved Items</h1>
-                    <div className="wishlist-grid">
+                <div className="wishlist-container container">
+                    <div className="wishlist-header animate-fade-in-up">
+                        <h1 className="wishlist-title">Saved Items</h1>
+                    </div>
+                    <div className="wishlist-grid animate-fade-in-up">
                         {[...Array(4)].map((_, i) => (
-                            <div key={i} className="wishlist-skeleton"></div>
+                            <div key={i} className="wishlist-skeleton card skeleton-shimmer"></div>
                         ))}
                     </div>
                 </div>
@@ -59,14 +61,16 @@ function Wishlist() {
     if (products.length === 0) {
         return (
             <div className="wishlist-page">
-                <div className="wishlist-container">
-                    <div className="wishlist-empty">
-                        <div className="empty-icon">❤️</div>
-                        <h2>No Saved Items Yet</h2>
-                        <p>Save products you love for easy access later!</p>
+                <div className="wishlist-container container">
+                    <div className="wishlist-empty card text-center animate-fade-in-up">
+                        <div className="empty-icon text-h1 mb-lg">❤️</div>
+                        <h2 className="empty-title mb-xs">No Saved Items Yet</h2>
+                        <p className="empty-description text-secondary mb-xl">
+                            Save products you love for easy access and quick checkout later!
+                        </p>
                         <button
                             onClick={() => navigate('/')}
-                            className="empty-action-button"
+                            className="btn btn--primary btn--large"
                         >
                             Start Shopping
                         </button>
@@ -78,20 +82,20 @@ function Wishlist() {
 
     return (
         <div className="wishlist-page">
-            <div className="wishlist-container">
-                <div className="wishlist-header">
+            <div className="wishlist-container container">
+                <div className="wishlist-header mb-xl animate-fade-in-up">
                     <h1 className="wishlist-title">
                         Saved Items ({products.length})
                     </h1>
                     <button
                         onClick={handleClearWishlist}
-                        className="clear-wishlist-button"
+                        className="btn-link text-danger"
                     >
-                        Clear All
+                        Remove All
                     </button>
                 </div>
 
-                <div className="wishlist-grid">
+                <div className="wishlist-grid animate-fade-in-up">
                     {products.map(product => (
                         <ProductCard
                             key={product.id}

@@ -21,7 +21,7 @@ function Account() {
     const shopInfo = {
         name: 'Much Shop',
         phone: '919876543210',
-        whatsapp: '919876543210',
+        // whatsapp: '919876543210',
         email: 'contact@muchshop.com',
         address: '123 Main Street Market Area, City - 500001',
         hours: {
@@ -57,11 +57,11 @@ function Account() {
         }
     }
 
-    const handleContactWhatsApp = () => {
-        const message = 'Hi Much Shop, I have a query about your products and services.'
-        const url = `https://wa.me/${shopInfo.whatsapp}?text=${encodeURIComponent(message)}`
-        window.open(url, '_blank')
-    }
+    // const handleContactWhatsApp = () => {
+    //     const message = 'Hi Much Shop, I have a query about your products and services.'
+    //     const url = `https://wa.me/${shopInfo.whatsapp}?text=${encodeURIComponent(message)}`
+    //     window.open(url, '_blank')
+    // }
 
     const formatDate = (timestamp) => {
         if (!timestamp) return 'Recently'
@@ -75,7 +75,7 @@ function Account() {
 
     return (
         <div className="account-page">
-            <div className="account-container">
+            <div className="account-container container">
 
                 {/* Tab Navigation */}
                 {user && (
@@ -97,20 +97,22 @@ function Account() {
 
                 {/* Orders Tab Content */}
                 {activeTab === 'orders' && user && (
-                    <MyOrders />
+                    <div className="orders-wrapper">
+                        <MyOrders />
+                    </div>
                 )}
 
                 {/* Profile Tab Content */}
                 {activeTab === 'profile' && (
-                    <>
+                    <div className="profile-content">
 
                         {/* ================= USER PROFILE SECTION ================= */}
                         {user && (
-                            <section className="profile-section">
+                            <section className="profile-section card">
                                 <div className="profile-header">
                                     <div className="profile-title-group">
-                                        <h2>My Profile</h2>
-                                        <p>Manage your account information</p>
+                                        <h2 className="section-title">My Profile</h2>
+                                        <p className="text-secondary">Manage your account information</p>
                                     </div>
 
                                     {/* Admin Badge */}
@@ -126,41 +128,41 @@ function Account() {
                                     <div className="profile-info">
                                         <div className="profile-grid">
                                             <div className="profile-field">
-                                                <label>Name</label>
-                                                <p>{name || 'Not set'}</p>
+                                                <label className="text-secondary">Name</label>
+                                                <p className="font-semibold">{name || 'Not set'}</p>
                                             </div>
 
                                             <div className="profile-field">
-                                                <label>Phone</label>
-                                                <p>{phone || 'Not set'}</p>
+                                                <label className="text-secondary">Phone</label>
+                                                <p className="font-semibold">{phone || 'Not set'}</p>
                                             </div>
 
                                             <div className="profile-field">
-                                                <label>Email</label>
-                                                <p>{user.email}</p>
+                                                <label className="text-secondary">Email</label>
+                                                <p className="font-semibold">{user.email}</p>
                                             </div>
 
                                             <div className="profile-field">
-                                                <label>Member Since</label>
-                                                <p>{formatDate(userProfile?.createdAt)}</p>
+                                                <label className="text-secondary">Member Since</label>
+                                                <p className="font-semibold">{formatDate(userProfile?.createdAt)}</p>
                                             </div>
                                         </div>
 
                                         <button
                                             onClick={() => setEditing(true)}
-                                            className="btn-primary"
+                                            className="btn btn--primary"
                                         >
-                                            ✏️ Edit Profile
+                                            Edit Profile
                                         </button>
                                     </div>
                                 ) : (
                                     /* Edit Form */
                                     <form onSubmit={handleUpdateProfile} className="edit-form">
                                         <div className="form-group">
-                                            <label>Full Name</label>
+                                            <label className="font-medium mb-xs">Full Name</label>
                                             <input
                                                 type="text"
-                                                className="form-input"
+                                                className="input"
                                                 value={name}
                                                 onChange={(e) => setName(e.target.value)}
                                                 placeholder="Enter your name"
@@ -168,10 +170,10 @@ function Account() {
                                         </div>
 
                                         <div className="form-group">
-                                            <label>Phone Number</label>
+                                            <label className="font-medium mb-xs">Phone Number</label>
                                             <input
                                                 type="tel"
-                                                className="form-input"
+                                                className="input"
                                                 value={phone}
                                                 onChange={(e) => setPhone(e.target.value)}
                                                 placeholder="Enter phone number"
@@ -182,7 +184,7 @@ function Account() {
                                         <div className="button-group">
                                             <button
                                                 type="submit"
-                                                className="btn-primary"
+                                                className="btn btn--primary"
                                                 disabled={loading}
                                             >
                                                 {loading ? 'Saving...' : 'Save Changes'}
@@ -195,7 +197,7 @@ function Account() {
                                                     setPhone(userProfile?.phone || '')
                                                     setMessage({ type: '', text: '' })
                                                 }}
-                                                className="btn-secondary"
+                                                className="btn btn--secondary"
                                                 disabled={loading}
                                             >
                                                 Cancel
@@ -206,7 +208,7 @@ function Account() {
 
                                 {/* Success/Error Message */}
                                 {message.text && (
-                                    <div className={`message ${message.type}`}>
+                                    <div className={`message mt-md ${message.type}`}>
                                         {message.text}
                                     </div>
                                 )}
@@ -214,21 +216,21 @@ function Account() {
                         )}
 
                         {/* ================= AUTH SECTION ================= */}
-                        <section className="profile-section">
-                            <h2>Account Actions</h2>
+                        <section className="profile-section card mt-lg">
+                            <h2 className="section-title">Account Actions</h2>
 
                             {/* NOT LOGGED IN */}
                             {!user && (
                                 <div className="profile-info">
-                                    <p>You are not logged in</p>
+                                    <p className="text-secondary mb-md">You are not logged in</p>
 
                                     <div className="button-group">
                                         <Link to="/login">
-                                            <button className="btn-primary">Login</button>
+                                            <button className="btn btn--primary">Login</button>
                                         </Link>
 
                                         <Link to="/signup">
-                                            <button className="btn-secondary">Signup</button>
+                                            <button className="btn btn--secondary">Signup</button>
                                         </Link>
                                     </div>
                                 </div>
@@ -240,7 +242,7 @@ function Account() {
                                     <div className="button-group">
                                         <button
                                             onClick={signout}
-                                            className="btn-danger"
+                                            className="btn btn--secondary"
                                         >
                                             Logout
                                         </button>
@@ -248,7 +250,7 @@ function Account() {
                                         {/* ADMIN BUTTON */}
                                         {isAdmin && (
                                             <Link to="/admin">
-                                                <button className="btn-admin">
+                                                <button className="btn btn--primary">
                                                     Admin Panel
                                                 </button>
                                             </Link>
@@ -260,87 +262,78 @@ function Account() {
 
                         {/* ================= SHOP INFO ================= */}
 
-                        {/* Header */}
-                        <div className="shop-info-section">
-                            <div className="shop-icon-wrapper">
-                                <span className="shop-icon">M</span>
+                        <div className="shop-info-wrapper mt-2xl">
+                            <div className="shop-icon-circle">
+                                <span>M</span>
                             </div>
-                            <h1 className="shop-name">{shopInfo.name}</h1>
-                            <p className="shop-tagline">Your trusted grocery partner</p>
+                            <h1 className="shop-name-title mt-md">{shopInfo.name}</h1>
+                            <p className="shop-tagline-text">{shopInfo.tagline || 'Your trusted grocery partner'}</p>
                         </div>
 
                         {/* Contact Information */}
-                        <section className="contact-section">
-                            <h2>Contact Us</h2>
+                        <section className="contact-section mt-xl">
+                            <h2 className="section-title mb-md">Contact Us</h2>
 
                             <div className="contact-list">
-                                {/* WhatsApp */}
-                                <button
-                                    onClick={handleContactWhatsApp}
-                                    className="whatsapp-button"
-                                >
-                                    <span>Chat on WhatsApp</span>
-                                </button>
-
                                 {/* Phone */}
-                                <div className="contact-item">
-                                    <div className="contact-label">Phone</div>
-                                    <a href={`tel:+${shopInfo.phone}`} className="contact-link">
+                                <div className="contact-card card">
+                                    <div className="text-secondary mb-xs">Phone</div>
+                                    <a href={`tel:+${shopInfo.phone}`} className="contact-link-accent font-semibold">
                                         +{shopInfo.phone}
                                     </a>
                                 </div>
 
                                 {/* Email */}
-                                <div className="contact-item">
-                                    <div className="contact-label">Email</div>
-                                    <a href={`mailto:${shopInfo.email}`} className="contact-link">
+                                <div className="contact-card card">
+                                    <div className="text-secondary mb-xs">Email</div>
+                                    <a href={`mailto:${shopInfo.email}`} className="contact-link-accent font-semibold">
                                         {shopInfo.email}
                                     </a>
                                 </div>
 
                                 {/* Address */}
-                                <div className="contact-item">
-                                    <div className="contact-label">Address</div>
-                                    <p className="contact-value">{shopInfo.address}</p>
+                                <div className="contact-card card">
+                                    <div className="text-secondary mb-xs">Address</div>
+                                    <p className="font-medium">{shopInfo.address}</p>
                                 </div>
                             </div>
                         </section>
 
                         {/* Business Hours */}
-                        <section className="hours-section">
-                            <h2>Business Hours</h2>
-                            <div className="hours-grid">
-                                <div className="hours-item">
-                                    <span className="hours-day">Monday - Friday</span>
-                                    <span className="hours-time">{shopInfo.hours.weekdays}</span>
+                        <section className="hours-section mt-xl">
+                            <h2 className="section-title mb-md">Business Hours</h2>
+                            <div className="hours-list">
+                                <div className="hours-item card mb-xs">
+                                    <span className="font-semibold">Monday - Friday</span>
+                                    <span className="text-secondary">{shopInfo.hours.weekdays}</span>
                                 </div>
-                                <div className="hours-item">
-                                    <span className="hours-day">Saturday - Sunday</span>
-                                    <span className="hours-time">{shopInfo.hours.weekends}</span>
+                                <div className="hours-item card">
+                                    <span className="font-semibold">Saturday - Sunday</span>
+                                    <span className="text-secondary">{shopInfo.hours.weekends}</span>
                                 </div>
                             </div>
                         </section>
 
                         {/* About */}
-                        <section className="about-section">
-                            <h2>About Us</h2>
-                            <div className="about-content">
-                                <p className="about-text">
+                        <section className="about-section mt-xl">
+                            <h2 className="section-title mb-md">About Us</h2>
+                            <div className="about-card card bg-surface">
+                                <p className="text-secondary mb-sm">
                                     Much Shop is your trusted neighborhood grocery store, committed to bringing you the freshest fruits, vegetables, and daily essentials right to your doorstep.
                                 </p>
-                                <p className="about-text">
+                                <p className="text-secondary">
                                     We source directly from local farms and trusted suppliers to ensure you get the best quality products at competitive prices.
                                 </p>
                             </div>
                         </section>
 
                         {/* App Version */}
-                        <div className="app-version">
-                            <p>Much Shop PWA v1.0.0</p>
-                            <p>Made with ❤️ for fresh food lovers</p>
+                        <div className="app-footer mt-2xl text-center">
+                            <p className="text-tertiary">Much Shop PWA v1.1.0</p>
+                            <p className="text-tertiary mt-xs">Made with ❤️ for fresh food lovers</p>
                         </div>
 
-                    </>
+                    </div>
                 )}
                 {/* End Profile Tab Content */}
 

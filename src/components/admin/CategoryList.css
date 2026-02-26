@@ -1,0 +1,233 @@
+.category-list-view {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Header */
+.view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.view-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Button Styles */
+.btn-primary,
+.btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    font-family: inherit;
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 195, 74, 0.3);
+}
+
+.btn-secondary {
+    background: #f5f5f5;
+    color: var(--color-text-primary);
+    border: 1px solid #e0e0e0;
+}
+
+.btn-secondary:hover {
+    background: #e8e8e8;
+    border-color: #d0d0d0;
+}
+
+/* Category Grid */
+.admin-category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+/* Category Card */
+.admin-category-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
+}
+
+.admin-category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border-color: var(--color-primary);
+}
+
+/* Card Icon */
+.card-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    transition: all 0.3s;
+}
+
+.admin-category-card:hover .card-icon-wrapper {
+    transform: scale(1.05);
+}
+
+.card-icon {
+    font-size: 2rem;
+}
+
+/* Card Details */
+.card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+}
+
+.card-title {
+    margin: 0;
+    font-size: 1.125rem;
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+.product-count {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+/* Card Actions */
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.admin-category-card:hover .card-actions {
+    opacity: 1;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #f5f5f5;
+    color: var(--color-text-secondary);
+}
+
+.action-btn:hover {
+    transform: scale(1.1);
+}
+
+.action-btn.edit:hover {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.action-btn.delete:hover {
+    background: #ffebee;
+    color: #d32f2f;
+}
+
+/* Empty State */
+.empty-categories {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--color-text-secondary);
+}
+
+.empty-categories p {
+    margin: 0;
+    font-size: 1.125rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .admin-category-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1rem;
+    }
+
+    .admin-category-card {
+        padding: 1.25rem;
+    }
+
+    .card-actions {
+        opacity: 1;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .header-actions button {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .view-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .view-header h3 {
+        font-size: 1.25rem;
+    }
+
+    .admin-category-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header-actions {
+        flex-direction: column;
+    }
+
+    .header-actions button {
+        width: 100%;
+    }
+}

@@ -1,93 +1,173 @@
-import { fetchProducts } from './productsService'
+import { db } from '../firebase'
+import {
+    collection,
+    getDocs,
+    getDoc,
+    doc,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp
+} from 'firebase/firestore'
 
-// Category definitions with metadata
-const CATEGORY_DEFINITIONS = [
-    {
-        id: 'fruits',
-        name: 'Fruits',
-        slug: 'fruits',
-        description: 'Fresh seasonal fruits',
-        icon: '🍎',
-        color: '#FF6B6B'
-    },
-    {
-        id: 'vegetables',
-        name: 'Vegetables',
-        slug: 'vegetables',
-        description: 'Farm-fresh vegetables',
-        icon: '🥬',
-        color: '#8BC34A'
-    },
-    {
-        id: 'dairy',
-        name: 'Dairy',
-        slug: 'dairy',
-        description: 'Milk, cheese & more',
-        icon: '🥛',
-        color: '#4CAF50'
-    },
-    {
-        id: 'bakery',
-        name: 'Bakery',
-        slug: 'bakery',
-        description: 'Fresh baked goods',
-        icon: '🍞',
-        color: '#FF9800'
-    },
-    {
-        id: 'beverages',
-        name: 'Beverages',
-        slug: 'beverages',
-        description: 'Drinks & refreshments',
-        icon: '🥤',
-        color: '#2196F3'
-    },
-    {
-        id: 'snacks',
-        name: 'Snacks',
-        slug: 'snacks',
-        description: 'Chips, cookies & treats',
-        icon: '🍿',
-        color: '#FFC107'
-    }
-]
+// Collection reference
+const COLLECTION_NAME = 'categories'
 
 /**
- * Get all categories with product counts
- * @returns {Promise<Array>} Array of categories with product counts
+ * Get all categories from Firestore
+ * @returns {Promise<Array>} Array of category objects
  */
 export async function getAllCategories() {
-    const products = await fetchProducts()
+    try {
+        const categoriesRef = collection(db, COLLECTION_NAME)
+        const q = query(categoriesRef, orderBy('name'))
+        const snapshot = await getDocs(q)
 
-    // Count products per category
-    const productCounts = products.reduce((acc, product) => {
-        const categoryName = product.category
-        acc[categoryName] = (acc[categoryName] || 0) + 1
-        return acc
-    }, {})
-
-    // Merge definitions with product counts
-    return CATEGORY_DEFINITIONS.map(cat => ({
-        ...cat,
-        productCount: productCounts[cat.name] || 0
-    })).filter(cat => cat.productCount > 0) // Only show categories with products
+        return snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }))
+    } catch (error) {
+        console.error('Error fetching categories:', error)
+        return []
+    }
 }
 
 /**
- * Get category by slug
- * @param {string} slug - Category slug
- * @returns {Promise<Object|null>} Category object or null
+ * Listen to categories in real-time
+ * @param {Function} callback 
  */
-export async function getCategoryBySlug(slug) {
-    const categories = await getAllCategories()
-    return categories.find(cat => cat.slug === slug) || null
+export function listenCategoriesRealtime(callback) {
+    const categoriesRef = collection(db, COLLECTION_NAME)
+    const q = query(categoriesRef, orderBy('name'))
+
+    return onSnapshot(q, (snapshot) => {
+        const categories = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }))
+        callback(categories)
+    })
 }
 
 /**
- * Get category definition (without product count)
- * @param {string} slug - Category slug
- * @returns {Object|null} Category definition or null
+ * Upload category image to Cloudinary
+ * @param {File} file - Image file
+ * @param {string} categoryId - Optional category ID for naming
+ * @returns {Promise<string>} Cloudinary URL
  */
-export function getCategoryDefinition(slug) {
-    return CATEGORY_DEFINITIONS.find(cat => cat.slug === slug) || null
+export async function uploadCategoryImage(file, categoryId = null) {
+    if (!file) throw new Error('No file provided')
+
+    try {
+        const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dqdbw0aab'
+        const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'grocery_products'
+
+        console.log('Uploading category image to Cloudinary...')
+
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('upload_preset', uploadPreset)
+
+        // Optional: Add folder and public_id for organization
+        if (categoryId) {
+            formData.append('public_id', `category_${categoryId}`)
+        }
+        formData.append('folder', 'categories')
+
+        // Upload to Cloudinary
+        const response = await fetch(
+            `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+            {
+                method: 'POST',
+                body: formData
+            }
+        )
+
+        if (!response.ok) {
+            const error = await response.json()
+            throw new Error(error.error?.message || 'Upload failed')
+        }
+
+        const data = await response.json()
+        console.log('Category image upload successful:', data.secure_url)
+
+        // Return the secure URL
+        return data.secure_url
+    } catch (error) {
+        console.error('Error uploading category image to Cloudinary:', error)
+        throw error
+    }
+}
+
+/**
+ * Add a new category
+ * @param {Object} categoryData 
+ */
+export async function addCategory(categoryData) {
+    try {
+        const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+            ...categoryData,
+            productCount: 0, // Initial count
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+        })
+        return docRef.id
+    } catch (error) {
+        console.error('Error adding category:', error)
+        throw error
+    }
+}
+
+import { updateProductsCategory } from './productsService'
+
+// ... existing imports ...
+
+/**
+ * Update a category
+ * @param {string} id 
+ * @param {Object} categoryData 
+ */
+export async function updateCategory(id, categoryData) {
+    try {
+        const categoryRef = doc(db, COLLECTION_NAME, id)
+
+        // If name is changing, we need to update all associated products
+        if (categoryData.name) {
+            const oldDoc = await getDoc(categoryRef)
+            if (oldDoc.exists()) {
+                const oldName = oldDoc.data().name
+                if (oldName && oldName !== categoryData.name) {
+                    // Trigger batch update for products
+                    // We don't await this to keep UI snappy, or we SHOULD await to ensure consistency?
+                    // Better to await so we know it finished.
+                    await updateProductsCategory(oldName, categoryData.name)
+                }
+            }
+        }
+
+        await updateDoc(categoryRef, {
+            ...categoryData,
+            updatedAt: serverTimestamp()
+        })
+    } catch (error) {
+        console.error('Error updating category:', error)
+        throw error
+    }
+}
+
+/**
+ * Delete a category
+ * @param {string} id 
+ */
+export async function deleteCategory(id) {
+    try {
+        await deleteDoc(doc(db, COLLECTION_NAME, id))
+    } catch (error) {
+        console.error('Error deleting category:', error)
+        throw error
+    }
 }

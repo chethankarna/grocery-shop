@@ -44,6 +44,14 @@ export function AuthProvider({ children }) {
             setUserProfile(null);
             setIsAdmin(false);
 
+            // Sync cart service with current user
+            setCartUser(currentUser)
+            if (currentUser && !currentUser.isAnonymous) {
+                loadCartFromFirestore().catch(err =>
+                    console.warn('Cart sync failed:', err)
+                )
+            }
+
             if (currentUser) {
                 try {
                     console.log('📝 Fetching user profile for:', currentUser.uid);

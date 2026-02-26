@@ -18,13 +18,11 @@ export default function Signup() {
         e.preventDefault();
         setError("");
 
-        // Validate passwords match
         if (password !== confirmPassword) {
             setError("Passwords do not match");
             return;
         }
 
-        // Validate password length
         if (password.length < 6) {
             setError("Password must be at least 6 characters");
             return;
@@ -35,13 +33,10 @@ export default function Signup() {
         try {
             await signup(email, password);
 
-            // Check if user came from checkout
             const state = location.state;
             if (state?.intent === 'PLACE_ORDER' && state?.next === '/checkout') {
-                // Redirect back to checkout to complete order
                 nav('/checkout', { replace: true, state: { orderType: state.orderType } });
             } else {
-                // Normal signup - go to home
                 nav("/", { replace: true });
             }
         } catch (err) {
@@ -52,113 +47,93 @@ export default function Signup() {
     }
 
     return (
-        <div className="auth-container">
-            <div className="auth-card">
-                {/* Logo & Header */}
-                <div className="auth-header">
-                    <div className="auth-logo">
-                        <div className="auth-logo-icon">🛒</div>
-                        <span className="auth-logo-text">Much Shop</span>
+        <div className="auth-page">
+            <div className="auth-container container">
+                <div className="auth-card card animate-fade-in-up">
+                    {/* Header Section */}
+                    <div className="auth-header text-center mb-xl">
+                        <div className="auth-logo mb-md">
+                            <span className="logo-icon text-h1 d-block mb-xs">🛒</span>
+                            <span className="logo-text text-h3 text-bold">Much Shop</span>
+                        </div>
+                        <h1 className="auth-title text-h2 mb-xs">Create Account</h1>
+                        <p className="auth-subtitle text-secondary">Join us to start ordering fresh products</p>
                     </div>
-                    <h1 className="auth-title">Create Account</h1>
-                    <p className="auth-subtitle">Sign up to start ordering fresh groceries</p>
-                </div>
 
-                {/* Checkout Alert */}
-                {location.state?.intent === 'PLACE_ORDER' && (
-                    <div className="auth-alert">
-                        <span className="auth-alert-icon">🔒</span>
-                        <span className="auth-alert-text">
-                            Please create an account to complete your order
-                        </span>
-                    </div>
-                )}
+                    {/* Alerts */}
+                    {location.state?.intent === 'PLACE_ORDER' && (
+                        <div className="alert alert--info mb-lg">
+                            <span className="alert-icon">🔒</span>
+                            <span className="alert-message">Please create an account to complete your order</span>
+                        </div>
+                    )}
 
-                {/* Error Message */}
-                {error && (
-                    <div className="auth-error">
-                        <div className="auth-error-text">{error}</div>
-                    </div>
-                )}
+                    {error && (
+                        <div className="alert alert--danger mb-lg">
+                            <span className="alert-icon">⚠️</span>
+                            <span className="alert-message">{error}</span>
+                        </div>
+                    )}
 
-                {/* Signup Form */}
-                <form className="auth-form" onSubmit={handleSignup}>
-                    <div className="auth-form-group">
-                        <label className="auth-label" htmlFor="email">
-                            Email Address
-                        </label>
-                        <input
-                            id="email"
-                            type="email"
-                            className="auth-input"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="your@email.com"
-                            required
+                    {/* Signup Form */}
+                    <form className="auth-form" onSubmit={handleSignup}>
+                        <div className="form-group mb-md">
+                            <label className="input-label">Email Address</label>
+                            <input
+                                type="email"
+                                className="input-field"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="name@example.com"
+                                required
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <div className="form-group mb-md">
+                            <label className="input-label">Password</label>
+                            <input
+                                type="password"
+                                className="input-field"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="At least 6 characters"
+                                required
+                                disabled={loading}
+                                minLength={6}
+                            />
+                        </div>
+
+                        <div className="form-group mb-xl">
+                            <label className="input-label">Confirm Password</label>
+                            <input
+                                type="password"
+                                className="input-field"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="Re-enter password"
+                                required
+                                disabled={loading}
+                                minLength={6}
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            className={`btn btn--primary btn--large w-full ${loading ? 'is-loading' : ''}`}
                             disabled={loading}
-                        />
+                        >
+                            {loading ? 'Creating account...' : 'Create Account'}
+                        </button>
+                    </form>
+
+                    {/* Footer */}
+                    <div className="auth-footer mt-xl text-center">
+                        <p className="text-small text-secondary">
+                            Already have an account?{' '}
+                            <Link to="/login" className="btn-link text-bold">Sign In</Link>
+                        </p>
                     </div>
-
-                    <div className="auth-form-group">
-                        <label className="auth-label" htmlFor="password">
-                            Password
-                        </label>
-                        <input
-                            id="password"
-                            type="password"
-                            className="auth-input"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="At least 6 characters"
-                            required
-                            disabled={loading}
-                            minLength={6}
-                        />
-                    </div>
-
-                    <div className="auth-form-group">
-                        <label className="auth-label" htmlFor="confirmPassword">
-                            Confirm Password
-                        </label>
-                        <input
-                            id="confirmPassword"
-                            type="password"
-                            className="auth-input"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="Re-enter your password"
-                            required
-                            disabled={loading}
-                            minLength={6}
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        className="auth-button auth-button-primary"
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <>
-                                <span>Creating account...</span>
-                            </>
-                        ) : (
-                            <>
-                                <span>Create Account</span>
-                                <span>→</span>
-                            </>
-                        )}
-                    </button>
-                </form>
-
-                {/* Footer Link */}
-                <div className="auth-footer">
-                    <p className="auth-footer-text">
-                        Already have an account?{' '}
-                        <Link to="/login" className="auth-link">
-                            Login
-                        </Link>
-                    </p>
                 </div>
             </div>
         </div>

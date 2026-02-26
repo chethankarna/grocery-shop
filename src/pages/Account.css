@@ -1,184 +1,119 @@
-/* Account Page Styles */
+/* ============================================
+   ACCOUNT PAGE - Mobile-First
+   ============================================ */
 
-/* Main Container */
 .account-page {
     min-height: 100vh;
-    background-color: white;
-    padding-bottom: 1.5rem;
+    background-color: var(--color-bg);
+    padding-bottom: calc(var(--nav-height) + var(--space-xl));
 }
 
 .account-container {
-    max-width: 48rem;
+    max-width: var(--container-max-width);
     margin: 0 auto;
-    padding: 1rem 1rem 1.5rem;
+    padding: var(--space-md) var(--page-padding-x);
 }
 
-/* Tab Navigation */
+/* ============================================
+   TAB NAVIGATION
+   ============================================ */
 .account-tabs {
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid #E5E7EB;
+    gap: 0;
+    margin-bottom: var(--space-lg);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: 4px;
 }
 
 .tab-button {
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    background: none;
+    flex: 1;
+    padding: var(--space-sm) var(--space-md);
+    min-height: 44px;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    background: transparent;
     border: none;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: all 0.2s;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    color: #6B7280;
+    transition: all var(--transition-fast);
+    color: var(--color-text-secondary);
 }
 
-.tab-button:hover {
-    color: #374151;
+.tab-button:active {
+    transform: scale(0.98);
 }
 
 .tab-button.active {
-    color: var(--primary);
-    border-bottom-color: var(--primary);
+    background: var(--color-bg-card);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+    box-shadow: var(--shadow-sm);
 }
 
-/* Profile Section */
+/* ============================================
+   PROFILE SECTION
+   ============================================ */
 .profile-section {
-    margin-bottom: 2rem;
-    background-color: white;
-    border: 2px solid rgba(16, 184, 128, 0.1);
-    border-radius: 0.5rem;
-    padding: 1.5rem;
+    margin-bottom: var(--space-xl);
 }
 
 .profile-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-md);
 }
 
-.profile-title-group h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 0.25rem;
-}
-
-.profile-title-group p {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-}
-
-/* Admin Badge */
+/* ============================================
+   ADMIN BADGE
+   ============================================ */
 .admin-badge {
-    background-color: #FEF3C7;
-    color: #92400E;
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
+    background-color: var(--color-text-primary);
+    color: #FFFFFF;
+    font-size: var(--font-size-tiny);
+    font-weight: var(--font-weight-semibold);
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
-/* Profile Info Display */
+/* ============================================
+   PROFILE INFO
+   ============================================ */
 .profile-info {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--space-md);
 }
 
 .profile-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
 }
 
 .profile-field label {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
     display: block;
-    margin-bottom: 0.25rem;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+    margin-bottom: 4px;
 }
 
 .profile-field p {
-    font-weight: 600;
-    color: var(--text-primary);
+    font-size: var(--font-size-body);
+    color: var(--color-text-primary);
 }
 
-/* Buttons */
-.btn-primary {
-    background-color: var(--primary);
-    color: white;
-    padding: 0.5rem 1.5rem;
-    border-radius: 0.5rem;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    font-weight: 600;
-}
-
-.btn-primary:hover {
-    background-color: var(--primary-dark);
-}
-
-.btn-secondary {
-    background-color: #6B7280;
-    color: white;
-    padding: 0.5rem 1.5rem;
-    border-radius: 0.5rem;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    font-weight: 600;
-}
-
-.btn-secondary:hover {
-    background-color: #4B5563;
-}
-
-.btn-danger {
-    background-color: #DC2626;
-    color: white;
-    padding: 0.5rem 1.5rem;
-    border-radius: 0.5rem;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    font-weight: 600;
-}
-
-.btn-danger:hover {
-    background-color: #B91C1C;
-}
-
-.btn-admin {
-    background-color: black;
-    color: white;
-    padding: 0.5rem 1.5rem;
-    border-radius: 0.5rem;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-admin:hover {
-    background-color: #1F2937;
-}
-
-.button-group {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-/* Edit Form */
+/* ============================================
+   EDIT FORM
+   ============================================ */
 .edit-form {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--space-md);
 }
 
 .form-group {
@@ -186,272 +121,130 @@
     flex-direction: column;
 }
 
-.form-group label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    display: block;
-    margin-bottom: 0.5rem;
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
 }
 
-.form-input {
-    width: 100%;
-    padding: 0.5rem 1rem;
-    border: 1px solid #D1D5DB;
-    border-radius: 0.5rem;
-    outline: none;
-    transition: all 0.2s;
-}
-
-.form-input:focus {
-    outline: 2px solid var(--primary);
-    outline-offset: 0;
-    border-color: var(--primary);
-}
-
-/* Messages */
+/* ============================================
+   MESSAGES
+   ============================================ */
 .message {
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    margin-bottom: 1rem;
-    font-weight: 500;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
 }
 
 .message.success {
-    background-color: #D1FAE5;
-    color: #065F46;
+    background-color: #F0FDF4;
+    color: var(--color-success);
+    border: 1px solid #BBF7D0;
 }
 
 .message.error {
-    background-color: #FEE2E2;
-    color: #991B1B;
+    background-color: #FEF2F2;
+    color: var(--color-error);
+    border: 1px solid #FECACA;
 }
 
-/* Shop Info Section */
-.shop-info-section {
+/* ============================================
+   SHOP INFO SECTION
+   ============================================ */
+.shop-info-wrapper {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-xl);
 }
 
-.shop-icon-wrapper {
-    width: 5rem;
-    height: 5rem;
-    background-color: var(--primary);
-    border-radius: 50%;
+.shop-icon-circle {
+    width: 64px;
+    height: 64px;
+    background-color: var(--color-text-primary);
+    color: #FFFFFF;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 1rem;
+    margin: 0 auto var(--space-md);
+    font-size: 24px;
+    font-weight: var(--font-weight-bold);
 }
 
-.shop-icon {
-    color: white;
-    font-weight: 700;
-    font-size: 2rem;
+.shop-name-title {
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
 }
 
-.shop-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
+.shop-tagline-text {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body);
 }
 
-.shop-tagline {
-    color: var(--text-secondary);
-}
-
-/* Contact Section */
-.contact-section {
-    margin-bottom: 1.5rem;
-}
-
-.contact-section h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-}
-
+/* ============================================
+   CONTACT SECTION
+   ============================================ */
 .contact-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--space-sm);
 }
 
-.whatsapp-button {
-    width: 100%;
-    background-color: #16a34a;
-    color: white;
-    font-weight: 600;
-    padding: 1rem 1.5rem;
-    border-radius: 0.5rem;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
+.contact-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-light);
+    padding: var(--space-md);
 }
 
-.whatsapp-button:hover {
-    background-color: #15803d;
-}
-
-.contact-item {
-    background-color: #FAFAFA;
-    border-radius: 0.5rem;
-    padding: 1rem;
-}
-
-.contact-label {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.25rem;
-}
-
-.contact-value {
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.contact-link {
-    color: var(--primary);
+.contact-link-accent {
+    color: var(--color-accent);
     text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s;
+    font-weight: var(--font-weight-medium);
 }
 
-.contact-link:hover {
-    color: var(--primary-dark);
-}
-
-/* Business Hours */
-.hours-section {
-    margin-bottom: 1.5rem;
-}
-
-.hours-section h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-}
-
-.hours-grid {
+/* ============================================
+   HOURS SECTION
+   ============================================ */
+.hours-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--space-xs);
 }
 
 .hours-item {
     display: flex;
     justify-content: space-between;
-    padding: 0.75rem 1rem;
-    background-color: #FAFAFA;
-    border-radius: 0.5rem;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-light);
+    padding: var(--space-md);
 }
 
-.hours-day {
-    font-weight: 600;
-    color: var(--text-primary);
+/* ============================================
+   ABOUT SECTION
+   ============================================ */
+.about-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-light);
+    padding: var(--space-md);
+    line-height: var(--line-height-body);
 }
 
-.hours-time {
-    color: var(--text-secondary);
+.bg-surface {
+    background-color: var(--color-surface);
 }
 
-/* Address Section */
-.address-section {
-    margin-bottom: 1.5rem;
-}
-
-.address-section h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-}
-
-.address-content {
-    background-color: #FAFAFA;
-    padding: 1rem;
-    border-radius: 0.5rem;
-}
-
-.address-icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.address-text {
-    color: var(--text-primary);
-    line-height: 1.6;
-}
-
-/* About Section */
-.about-section {
-    margin-bottom: 1.5rem;
-}
-
-.about-section h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-}
-
-.about-content {
-    background-color: #F9FAFB;
-    padding: 1rem;
-    border-radius: 0.5rem;
-}
-
-.about-text {
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 1rem;
-}
-
-.about-text:last-child {
-    margin-bottom: 0;
-}
-
-/* App Version */
-.app-version {
-    text-align: center;
-    margin-top: 2rem;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-}
-
-.app-version p {
-    margin: 0.25rem 0;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .profile-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .button-group {
-        flex-direction: column;
-    }
-
-    .button-group button,
-    .button-group a {
-        width: 100%;
-        text-align: center;
-    }
-
-    .account-tabs {
-        gap: 0;
-    }
-
-    .tab-button {
-        flex: 1;
-        padding: 0.75rem 1rem;
-    }
+/* ============================================
+   SECTION TITLES
+   ============================================ */
+.section-title {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-md);
 }
